@@ -9,6 +9,9 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+        .hidden {
+            display: none;
+        }
         ul {
             list-style: none;
             padding: 0;
@@ -24,14 +27,28 @@
     </style>
 </head>
 <body>
-    <h1>タスク管理</h1>
-    <form id="task-form">
-        <input type="text" id="task-input" placeholder="タスクを入力してください" required>
-        <button type="submit">追加</button>
-    </form>
-    <ul id="task-list"></ul>
+    <!-- ログイン画面 -->
+    <div id="login-section">
+        <h1>ログイン</h1>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="メールアドレス" required>
+            <input type="password" id="password" placeholder="パスワード" required>
+            <button type="submit">ログイン</button>
+        </form>
+        <button id="register-button">新規登録はこちら</button>
+    </div>
+    <!-- タスク管理画面 -->
+    <div id="todo-section" class="hidden">
+        <h1>タスク管理</h1>
+        <button id="logout-button">ログアウト</button>
+        <form id="task-form">
+            <input type="text" id="task-input" placeholder="タスクを入力してください" required>
+            <button type="submit">追加</button>
+        </form>
+        <ul id="task-list"></ul>
+    </div>
 
-    <!-- Firebase SDK -->
+    <!-- JavaScriptファイルの読み込み -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
