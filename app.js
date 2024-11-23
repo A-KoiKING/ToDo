@@ -59,21 +59,6 @@ loginForm.addEventListener("submit", (e) => {
         });
 });
 
-// 新規登録処理
-registerButton.addEventListener("click", () => {
-    const email = prompt("新しいメールアドレスを入力してください:");
-    const password = prompt("パスワードを入力してください（6文字以上）:");
-    if (email && password) {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                alert("登録が完了しました。ログインしてください。");
-            })
-            .catch((error) => {
-                alert("登録に失敗しました: " + error.message);
-            });
-    }
-});
-
 // ログアウト処理
 logoutButton.addEventListener("click", () => {
     signOut(auth).catch((error) => {
