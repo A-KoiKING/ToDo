@@ -1,14 +1,16 @@
+// 必要なFirebase SDKの関数をインポート
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
+// Firebase設定
 const firebaseConfig = {
-  apiKey: "AIzaSyAnlKqY57-RezoII0FLXhiSZJyjuKFbc3s",
-  authDomain: "todo-13521.firebaseapp.com",
-  projectId: "todo-13521",
-  storageBucket: "todo-13521.firebasestorage.app",
-  messagingSenderId: "887675608384",
-  appId: "1:887675608384:web:969383e374d4e03a616ea5",
-  measurementId: "G-LLL2PC42TQ"
+    apiKey: "AIzaSyAnlKqY57-RezoII0FLXhiSZJyjuKFbc3s",
+    authDomain: "todo-13521.firebaseapp.com",
+    projectId: "todo-13521",
+    storageBucket: "todo-13521.firebasestorage.app",
+    messagingSenderId: "887675608384",
+    appId: "1:887675608384:web:969383e374d4e03a616ea5",
+    measurementId: "G-LLL2PC42TQ"
 };
 
 // Firebase初期化
@@ -31,20 +33,21 @@ loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const userId = userIdInput.value.trim();
     const password = passwordInput.value.trim();
+    
+    console.log('Logging in with', userId, password);
 
-    // ユーザーIDとパスワードの確認
     const userRef = collection(firestore, 'users');
     const userSnapshot = await getDocs(query(userRef, where('id', '==', userId), where('password', '==', password)));
     
     if (!userSnapshot.empty) {
-        // ログイン成功
+        console.log('Login successful');
         loginSection.classList.add("hidden");
         todoSection.classList.remove("hidden");
         userIdInput.value = "";
         passwordInput.value = "";
         loadTasks();  // タスクの読み込み
     } else {
-        // ログイン失敗
+        console.log('Login failed');
         alert("ユーザーIDまたはパスワードが間違っています");
     }
 });
