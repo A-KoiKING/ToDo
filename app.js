@@ -1,9 +1,5 @@
-// sha256をインポート
-import sha256 from "https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/src/sha256.js";
-
-// Firebase SDKのインポート
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 // Firebase設定
@@ -19,65 +15,52 @@ const firebaseConfig = {
 
 // Firebase初期化
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const db = getDatabase(app);
+const firestore = getFirestore(app);
 
 // HTML要素の取得
 const loginSection = document.getElementById("login-section");
 const todoSection = document.getElementById("todo-section");
 const loginForm = document.getElementById("login-form");
-const emailInput = document.getElementById("email");
+const userIdInput = document.getElementById("user-id");
 const passwordInput = document.getElementById("password");
-const registerButton = document.getElementById("register-button");
 const logoutButton = document.getElementById("logout-button");
 const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
 
-// ユーザーの認証状態を監視
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // ログイン中の場合
-        loginSection.classList.add("hidden");
-        todoSection.classList.remove("hidden");
-        loadTasks(); // タスクの読み込み
-    } else {
-        // 未ログインの場合
-        loginSection.classList.remove("hidden");
-        todoSection.classList.add("hidden");
-    }
-});
-
 // ログイン処理
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = emailInput.value.trim();
+    const userId = userIdInput.value.trim();
     const password = passwordInput.value.trim();
 
-    // パスワードをハッシュ化
-    const hashedPassword = sha256(password);
-
-    // ハッシュ化されたパスワードでログイン処理
-    signInWithEmailAndPassword(auth, email, hashedPassword)
-        .then(() => {
-            emailInput.value = "";
-            passwordInput.value = "";
-        })
-        .catch((error) => {
-            alert("ログインに失敗しました: " + error.message);
-        });
+    // ユーザーIDとパスワードの確認
+    const userRef = ref(db, 'users/' + userId);
+    const snapshot = await get(userRef);
+    
+    if (snapshot.exists() && snapshot.val().password === password) {
+        // ログイン成功
+        loginSection.classList.add("hidden");
+        todoSection.classList.remove("hidden");
+        userIdInput.value = "";
+        passwordInput.value = "";
+        loadTasks();  // タスクの読み込み
+    } else {
+        // ログイン失敗
+        alert("ユーザーIDまたはパスワードが間違っています");
+    }
 });
 
 // ログアウト処理
 logoutButton.addEventListener("click", () => {
-    signOut(auth).catch((error) => {
-        alert("ログアウトに失敗しました: " + error.message);
-    });
+    loginSection.classList.remove("hidden");
+    todoSection.classList.add("hidden");
 });
 
 // タスクの読み込み
 function loadTasks() {
-    const tasksCollection = collection(db, "tasks");
+    const tasksCollection = collection(firestore, "tasks");
     onSnapshot(tasksCollection, (snapshot) => {
         taskList.innerHTML = ""; // リストをクリア
         snapshot.forEach((doc) => {
@@ -102,7 +85,7 @@ taskForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const taskName = taskInput.value.trim();
     if (taskName) {
-        const tasksCollection = collection(db, "tasks");
+        const tasksCollection = collection(firestore, "tasks");
         await addDoc(tasksCollection, { name: taskName });
         taskInput.value = ""; // 入力フィールドをクリア
     }
