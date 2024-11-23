@@ -36,21 +36,28 @@ loginForm.addEventListener("submit", async (e) => {
     
     console.log('Logging in with', userId, password);
 
-    const userRef = collection(firestore, 'users');
-    const userSnapshot = await getDocs(query(userRef, where('id', '==', userId), where('password', '==', password)));
-    
-    if (!userSnapshot.empty) {
-        console.log('Login successful');
-        loginSection.classList.add("hidden");
-        todoSection.classList.remove("hidden");
-        userIdInput.value = "";
-        passwordInput.value = "";
-        loadTasks();  // タスクの読み込み
-    } else {
-        console.log('Login failed');
-        alert("ユーザーIDまたはパスワードが間違っています");
+    try {
+        const userRef = collection(firestore, 'users');
+        const userQuery = query(userRef, where('userId', '==', userId), where('password', '==', password));
+        const userSnapshot = await getDocs(userQuery);
+        
+        if (!userSnapshot.empty) {
+            console.log('Login successful');
+            loginSection.classList.add("hidden");
+            todoSection.classList.remove("hidden");
+            userIdInput.value = "";
+            passwordInput.value = "";
+            loadTasks();  // タスクの読み込み
+        } else {
+            console.log('Login failed');
+            alert("ユーザーIDまたはパスワードが間違っています");
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        alert("ログイン中にエラーが発生しました。");
     }
 });
+
 
 // ログアウト処理
 logoutButton.addEventListener("click", () => {
