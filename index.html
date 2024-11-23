@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebaseタスク管理アプリ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>タスク管理アプリ</h1>
+    <form id="task-form">
+        <input type="text" id="task-input" placeholder="タスクを入力してください" required>
+        <button type="submit">追加</button>
+    </form>
+    <ul id="task-list"></ul>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "firebase/app";
+        import { getAnalytics } from "firebase/analytics";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+        apiKey: "AIzaSyAnlKqY57-RezoII0FLXhiSZJyjuKFbc3s",
+        authDomain: "todo-13521.firebaseapp.com",
+        projectId: "todo-13521",
+        storageBucket: "todo-13521.firebasestorage.app",
+        messagingSenderId: "887675608384",
+        appId: "1:887675608384:web:969383e374d4e03a616ea5",
+        measurementId: "G-LLL2PC42TQ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getAnalytics(app);
+
+        const tasksCollection = collection(db, "tasks");
+
+        // HTML要素の取得
+        const taskForm = document.getElementById('task-form');
+        const taskInput = document.getElementById('task-input');
+        const taskList = document.getElementById('task-list');
+
+        // Firestoreからタスクをリアルタイムで取得
+        onSnapshot(tasksCollection, (snapshot) => {
+            taskList.innerHTML = ''; // リストをクリア
+            snapshot.forEach(doc => {
+                const task = doc.data();
+                const li = document.createElement('li');
+                li.textContent = task.name;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '削除';
+                deleteButton.addEventListener('click', async () => {
+                    await deleteDoc(doc.ref);
+                });
+
+                li.appendChild(deleteButton);
+                taskList.appendChild(li);
+            });
+        });
+
+        // タスク追加時の処理
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const taskName = taskInput.value.trim();
+            if (taskName) {
+                await addDoc(tasksCollection, { name: taskName });
+                taskInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
