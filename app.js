@@ -77,22 +77,58 @@ function loadTasks() {
     const tasksQuery = query(tasksCollection, orderBy("createdAt", "asc"));  // 作成日時順に並び替え
     onSnapshot(tasksQuery, (snapshot) => {
         taskList.innerHTML = ""; // リストをクリア
+
+        // テーブル要素の作成
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+
+        // テーブルヘッダーの作成
+        const headerRow = document.createElement("tr");
+        const headers = ["ユーザー", "タスク名", "作成日時"];
+        headers.forEach(headerText => {
+            const th = document.createElement("th");
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        // テーブルボディにデータを追加
         snapshot.forEach((doc) => {
             const task = doc.data();
-            const li = document.createElement("li");
-            li.textContent = `${task.user} - ${task.name} - ${task.createdAt.toDate().toLocaleString()}`;  // タスク名と作成日時を表示
+            const row = document.createElement("tr");
 
+            const userCell = document.createElement("td");
+            userCell.textContent = task.user || "ユーザー不明";
+            row.appendChild(userCell);
+
+            const nameCell = document.createElement("td");
+            nameCell.textContent = task.name;
+            row.appendChild(nameCell);
+
+            const createdAtCell = document.createElement("td");
+            createdAtCell.textContent = task.createdAt.toDate().toLocaleString();
+            row.appendChild(createdAtCell);
+
+            // 削除ボタンのセル
+            const deleteButtonCell = document.createElement("td");
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "削除";
             deleteButton.addEventListener("click", async () => {
                 await deleteDoc(doc.ref);
             });
+            deleteButtonCell.appendChild(deleteButton);
+            row.appendChild(deleteButtonCell);
 
-            li.appendChild(deleteButton);
-            taskList.appendChild(li);
+            tbody.appendChild(row);
         });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        taskList.appendChild(table); // テーブルをリストに追加
     });
 }
+
 
 // タスク追加
 taskForm.addEventListener("submit", async (e) => {
