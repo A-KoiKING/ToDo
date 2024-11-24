@@ -3,16 +3,18 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebas
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-};
+    apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
+    authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
+    projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
+    storageBucket: "FIREBASE_STORAGE_BUCKET_PLACEHOLDER",
+    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER",
+    appId: "FIREBASE_APP_ID_PLACEHOLDER",
+    measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER",
+  };
   
-export default firebaseConfig;
+  // Firebase の初期化
+  firebase.initializeApp(firebaseConfig);
+  
   
 
 // Firebase初期化
