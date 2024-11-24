@@ -13,6 +13,7 @@ const firebaseConfig = {
   measurementId: "MEASUREMENT_ID",
 };
 
+
 // Firebase の初期化
 const app = initializeApp(firebaseConfig); // initializeAppを使用する
 const firestore = getFirestore(app); // Firestoreインスタンスを取得
