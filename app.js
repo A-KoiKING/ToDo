@@ -28,6 +28,10 @@ const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
 
+// クールタイムの設定
+const Cooltime = 1000;
+let isCooltime = false;
+
 // ログイン処理
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -90,10 +94,20 @@ function loadTasks() {
 // タスク追加
 taskForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if(isCooltime){
+        alert("クールタイム中です。しばらくお待ちください。");
+        return;
+    }
     const taskName = taskInput.value.trim();
     if (taskName) {
-        taskInput.value = ""; // 入力フィールドをクリア
+        taskInput.value = "";
         const tasksCollection = collection(firestore, "tasks");
-        await addDoc(tasksCollection, { name: taskName, createdAt: new Date() });  // 作成日時を追加
+        await addDoc(tasksCollection, { name: taskName, createdAt: new Date() });
+        
+        // クールタイム
+        isCooltime = true;
+        setTimeout(() => {
+            isCooltime = false;
+        }, Cooltime);
     }
 });
