@@ -2,16 +2,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
-// Firebase設定
 const firebaseConfig = {
-    apiKey: "AIzaSyAnlKqY57-RezoII0FLXhiSZJyjuKFbc3s",
-    authDomain: "todo-13521.firebaseapp.com",
-    projectId: "todo-13521",
-    storageBucket: "todo-13521.firebasestorage.app",
-    messagingSenderId: "887675608384",
-    appId: "1:887675608384:web:969383e374d4e03a616ea5",
-    measurementId: "G-LLL2PC42TQ"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
+  
+export default firebaseConfig;
+  
 
 // Firebase初期化
 const app = initializeApp(firebaseConfig);
