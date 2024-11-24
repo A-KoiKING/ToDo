@@ -54,7 +54,7 @@ loginForm.addEventListener("submit", async (e) => {
             todoSection.classList.remove("hidden");
             userIdInput.value = "";
             passwordInput.value = "";
-            loadTasks();  // タスクの読み込み
+            loadTasks();
         } else {
             console.log('Login failed');
             alert("ユーザーIDまたはパスワードが間違っています");
@@ -76,7 +76,7 @@ function loadTasks() {
     const tasksCollection = collection(firestore, "tasks");
     const tasksQuery = query(tasksCollection, orderBy("createdAt", "asc"));  // 作成日時順に並び替え
     onSnapshot(tasksQuery, (snapshot) => {
-        taskList.innerHTML = ""; // リストをクリア
+        taskList.innerHTML = "";
 
         // テーブル要素の作成
         const table = document.createElement("table");
@@ -125,7 +125,7 @@ function loadTasks() {
 
         table.appendChild(thead);
         table.appendChild(tbody);
-        taskList.appendChild(table); // テーブルをリストに追加
+        taskList.appendChild(table);
     });
 }
 
