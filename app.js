@@ -73,7 +73,7 @@ function loadTasks() {
         snapshot.forEach((doc) => {
             const task = doc.data();
             const li = document.createElement("li");
-            li.textContent = task.name;
+            li.textContent = `${task.name} - ${task.createdAt.toDate().toLocaleString()}`;  // タスク名と作成日時を表示
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "削除";
