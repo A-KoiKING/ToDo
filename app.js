@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy
 
 // Firebase 設定
 const firebaseConfig = {
+<<<<<<< HEAD
   apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
   authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
   projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
@@ -12,6 +13,21 @@ const firebaseConfig = {
   appId: "FIREBASE_APP_ID_PLACEHOLDER",
   measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER",
 };
+=======
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: "",
+  };
+  
+  // Firebase の初期化
+  firebase.initializeApp(firebaseConfig);
+  
+  
+>>>>>>> 86e45b3f6e2531815dd0c2990d9751d1387bcea2
 
 // Firebase の初期化
 const app = initializeApp(firebaseConfig); // initializeAppを使用する
