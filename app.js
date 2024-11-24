@@ -28,6 +28,7 @@ const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
 
+// userId設定
 let userId = "";
 
 // クールタイムの設定
@@ -79,7 +80,7 @@ function loadTasks() {
         snapshot.forEach((doc) => {
             const task = doc.data();
             const li = document.createElement("li");
-            li.textContent = `${task.name} - ${task.createdAt.toDate().toLocaleString()}`;  // タスク名と作成日時を表示
+            li.textContent = `${task.userId} - ${task.name} - ${task.createdAt.toDate().toLocaleString()}`;  // タスク名と作成日時を表示
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "削除";
