@@ -1,40 +1,50 @@
-name: Replace Environment Variables and Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - main  # GitHub Pagesにデプロイしたいブランチ
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # リポジトリのコードをチェックアウト
+      # リポジトリをクローン
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # 環境変数を app.js に置き換え
-      - name: Replace environment variables in app.js
+      # Node.jsをセットアップ
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      # Firebase設定を環境変数として設定
+      - name: Set Firebase environment variables
         run: |
-          sed -i "s/FIREBASE_API_KEY_PLACEHOLDER/${{ secrets.FIREBASE_API_KEY }}/g" app.js
-          sed -i "s/FIREBASE_AUTH_DOMAIN_PLACEHOLDER/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" app.js
-          sed -i "s/FIREBASE_PROJECT_ID_PLACEHOLDER/${{ secrets.FIREBASE_PROJECT_ID }}/g" app.js
-          sed -i "s/FIREBASE_STORAGE_BUCKET_PLACEHOLDER/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g" app.js
-          sed -i "s/FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g" app.js
-          sed -i "s/FIREBASE_APP_ID_PLACEHOLDER/${{ secrets.FIREBASE_APP_ID }}/g" app.js
-          sed -i "s/FIREBASE_MEASUREMENT_ID_PLACEHOLDER/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" app.js
+          echo "FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> $GITHUB_ENV
+          echo "FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}" >> $GITHUB_ENV
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}" >> $GITHUB_ENV
+          echo "FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}" >> $GITHUB_ENV
+          echo "FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}" >> $GITHUB_ENV
+          echo "FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}" >> $GITHUB_ENV
 
-      # 変更を main ブランチにコミット
-      - name: Commit changes
+      # Firebase設定を埋め込むためにビルド
+      - name: Build project
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.js
-          git commit -m "Replace environment variables in app.js" || echo "No changes to commit"
+          sed -i "s/API_KEY/${{ secrets.FIREBASE_API_KEY }}/g" src/app.js
+          sed -i "s/AUTH_DOMAIN/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" src/app.js
+          sed -i "s/PROJECT_ID/${{ secrets.FIREBASE_PROJECT_ID }}/g" src/app.js
+          sed -i "s/STORAGE_BUCKET/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g" src/app.js
+          sed -i "s/MESSAGING_SENDER_ID/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g" src/app.js
+          sed -i "s/APP_ID/${{ secrets.FIREBASE_APP_ID }}/g" src/app.js
+          sed -i "s/MEASUREMENT_ID/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" src/app.js
 
-      # 変更をプッシュ
-      - name: Push changes
-        run: git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # GitHub Pagesへデプロイ
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public  # 出力先ディレクトリ
