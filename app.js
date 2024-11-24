@@ -85,7 +85,7 @@ function loadTasks() {
 
         // テーブルヘッダーの作成
         const headerRow = document.createElement("tr");
-        const headers = ["ユーザー", "タスク名", "作成日時"];
+        const headers = ["ユーザー", "タスク名", "作成日時", "削除"];
         headers.forEach(headerText => {
             const th = document.createElement("th");
             th.textContent = headerText;
