@@ -1,6 +1,6 @@
 // 必要なFirebase SDKの関数をインポート
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 // Firebase設定
 const firebaseConfig = {
@@ -58,7 +58,6 @@ loginForm.addEventListener("submit", async (e) => {
     }
 });
 
-
 // ログアウト処理
 logoutButton.addEventListener("click", () => {
     loginSection.classList.remove("hidden");
@@ -68,7 +67,8 @@ logoutButton.addEventListener("click", () => {
 // タスクの読み込み
 function loadTasks() {
     const tasksCollection = collection(firestore, "tasks");
-    onSnapshot(tasksCollection, (snapshot) => {
+    const tasksQuery = query(tasksCollection, orderBy("createdAt", "asc"));  // 作成日時順に並び替え
+    onSnapshot(tasksQuery, (snapshot) => {
         taskList.innerHTML = ""; // リストをクリア
         snapshot.forEach((doc) => {
             const task = doc.data();
@@ -93,7 +93,7 @@ taskForm.addEventListener("submit", async (e) => {
     const taskName = taskInput.value.trim();
     if (taskName) {
         const tasksCollection = collection(firestore, "tasks");
-        await addDoc(tasksCollection, { name: taskName });
+        await addDoc(tasksCollection, { name: taskName, createdAt: new Date() });  // 作成日時を追加
         taskInput.value = ""; // 入力フィールドをクリア
     }
 });
