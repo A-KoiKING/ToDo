@@ -2,24 +2,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
+// Firebase 設定
 const firebaseConfig = {
-    apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
-    authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
-    projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
-    storageBucket: "FIREBASE_STORAGE_BUCKET_PLACEHOLDER",
-    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER",
-    appId: "FIREBASE_APP_ID_PLACEHOLDER",
-    measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER",
-  };
-  
-  // Firebase の初期化
-  firebase.initializeApp(firebaseConfig);
-  
-  
+  apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
+  authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
+  projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
+  storageBucket: "FIREBASE_STORAGE_BUCKET_PLACEHOLDER",
+  messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER",
+  appId: "FIREBASE_APP_ID_PLACEHOLDER",
+  measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER",
+};
 
-// Firebase初期化
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
+// Firebase の初期化
+const app = initializeApp(firebaseConfig); // initializeAppを使用する
+const firestore = getFirestore(app); // Firestoreインスタンスを取得
 
 // HTML要素の取得
 const loginSection = document.getElementById("login-section");
@@ -41,115 +37,114 @@ let isCooltime = false;
 
 // ログイン処理
 loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    userId = userIdInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    console.log('Logging in with', userId, password);
+  e.preventDefault();
+  userId = userIdInput.value.trim();
+  const password = passwordInput.value.trim();
+  
+  console.log('Logging in with', userId, password);
 
-    try {
-        const userRef = collection(firestore, 'users');
-        const userQuery = query(userRef, where('userId', '==', userId), where('password', '==', password));
-        const userSnapshot = await getDocs(userQuery);
-        
-        if (!userSnapshot.empty) {
-            console.log('Login successful');
-            loginSection.classList.add("hidden");
-            todoSection.classList.remove("hidden");
-            userIdInput.value = "";
-            passwordInput.value = "";
-            loadTasks();
-        } else {
-            console.log('Login failed');
-            alert("ユーザーIDまたはパスワードが間違っています");
-        }
-    } catch (error) {
-        console.error('Error during login:', error);
-        alert("ログイン中にエラーが発生しました。");
+  try {
+    const userRef = collection(firestore, 'users');
+    const userQuery = query(userRef, where('userId', '==', userId), where('password', '==', password));
+    const userSnapshot = await getDocs(userQuery);
+    
+    if (!userSnapshot.empty) {
+      console.log('Login successful');
+      loginSection.classList.add("hidden");
+      todoSection.classList.remove("hidden");
+      userIdInput.value = "";
+      passwordInput.value = "";
+      loadTasks();
+    } else {
+      console.log('Login failed');
+      alert("ユーザーIDまたはパスワードが間違っています");
     }
+  } catch (error) {
+    console.error('Error during login:', error);
+    alert("ログイン中にエラーが発生しました。");
+  }
 });
 
 // ログアウト処理
 logoutButton.addEventListener("click", () => {
-    loginSection.classList.remove("hidden");
-    todoSection.classList.add("hidden");
+  loginSection.classList.remove("hidden");
+  todoSection.classList.add("hidden");
 });
 
 // タスクの読み込み
 function loadTasks() {
-    const tasksCollection = collection(firestore, "tasks");
-    const tasksQuery = query(tasksCollection, orderBy("createdAt", "asc"));  // 作成日時順に並び替え
-    onSnapshot(tasksQuery, (snapshot) => {
-        taskList.innerHTML = "";
+  const tasksCollection = collection(firestore, "tasks");
+  const tasksQuery = query(tasksCollection, orderBy("createdAt", "asc"));  // 作成日時順に並び替え
+  onSnapshot(tasksQuery, (snapshot) => {
+    taskList.innerHTML = "";
 
-        // テーブル要素の作成
-        const table = document.createElement("table");
-        const thead = document.createElement("thead");
-        const tbody = document.createElement("tbody");
+    // テーブル要素の作成
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
 
-        // テーブルヘッダーの作成
-        const headerRow = document.createElement("tr");
-        const headers = ["ユーザー", "タスク名", "作成日時", "削除"];
-        headers.forEach(headerText => {
-            const th = document.createElement("th");
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        // テーブルボディにデータを追加
-        snapshot.forEach((doc) => {
-            const task = doc.data();
-            const row = document.createElement("tr");
-
-            const userCell = document.createElement("td");
-            userCell.textContent = task.user || "ユーザー不明";
-            row.appendChild(userCell);
-
-            const nameCell = document.createElement("td");
-            nameCell.textContent = task.name;
-            row.appendChild(nameCell);
-
-            const createdAtCell = document.createElement("td");
-            createdAtCell.textContent = task.createdAt.toDate().toLocaleString();
-            row.appendChild(createdAtCell);
-
-            // 削除ボタンのセル
-            const deleteButtonCell = document.createElement("td");
-            const deleteButton = document.createElement("button");
-            deleteButton.textContent = "削除";
-            deleteButton.addEventListener("click", async () => {
-                await deleteDoc(doc.ref);
-            });
-            deleteButtonCell.appendChild(deleteButton);
-            row.appendChild(deleteButtonCell);
-
-            tbody.appendChild(row);
-        });
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        taskList.appendChild(table);
+    // テーブルヘッダーの作成
+    const headerRow = document.createElement("tr");
+    const headers = ["ユーザー", "タスク名", "作成日時", "削除"];
+    headers.forEach(headerText => {
+      const th = document.createElement("th");
+      th.textContent = headerText;
+      headerRow.appendChild(th);
     });
-}
+    thead.appendChild(headerRow);
 
+    // テーブルボディにデータを追加
+    snapshot.forEach((doc) => {
+      const task = doc.data();
+      const row = document.createElement("tr");
+
+      const userCell = document.createElement("td");
+      userCell.textContent = task.user || "ユーザー不明";
+      row.appendChild(userCell);
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = task.name;
+      row.appendChild(nameCell);
+
+      const createdAtCell = document.createElement("td");
+      createdAtCell.textContent = task.createdAt.toDate().toLocaleString();
+      row.appendChild(createdAtCell);
+
+      // 削除ボタンのセル
+      const deleteButtonCell = document.createElement("td");
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "削除";
+      deleteButton.addEventListener("click", async () => {
+        await deleteDoc(doc.ref);
+      });
+      deleteButtonCell.appendChild(deleteButton);
+      row.appendChild(deleteButtonCell);
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    taskList.appendChild(table);
+  });
+}
 
 // タスク追加
 taskForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if(isCooltime){
-        alert("クールタイム中です。しばらくお待ちください。");
-        return;
-    }
-    const taskName = taskInput.value.trim();
-    if (taskName) {
-        taskInput.value = "";
-        const tasksCollection = collection(firestore, "tasks");
-        await addDoc(tasksCollection, { name: taskName, user: userId, createdAt: new Date() });
-        // クールタイム
-        isCooltime = true;
-        setTimeout(() => {
-            isCooltime = false;
-        }, Cooltime);
-    }
+  e.preventDefault();
+  if(isCooltime){
+    alert("クールタイム中です。しばらくお待ちください。");
+    return;
+  }
+  const taskName = taskInput.value.trim();
+  if (taskName) {
+    taskInput.value = "";
+    const tasksCollection = collection(firestore, "tasks");
+    await addDoc(tasksCollection, { name: taskName, user: userId, createdAt: new Date() });
+    // クールタイム
+    isCooltime = true;
+    setTimeout(() => {
+      isCooltime = false;
+    }, Cooltime);
+  }
 });
