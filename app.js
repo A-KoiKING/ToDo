@@ -92,8 +92,8 @@ taskForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const taskName = taskInput.value.trim();
     if (taskName) {
+        taskInput.value = ""; // 入力フィールドをクリア
         const tasksCollection = collection(firestore, "tasks");
         await addDoc(tasksCollection, { name: taskName, createdAt: new Date() });  // 作成日時を追加
-        taskInput.value = ""; // 入力フィールドをクリア
     }
 });
