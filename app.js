@@ -28,6 +28,8 @@ const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
 
+const userId = "";
+
 // クールタイムの設定
 const Cooltime = 1000;
 let isCooltime = false;
@@ -35,7 +37,7 @@ let isCooltime = false;
 // ログイン処理
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const userId = userIdInput.value.trim();
+    userId = userIdInput.value.trim();
     const password = passwordInput.value.trim();
     
     console.log('Logging in with', userId, password);
@@ -102,8 +104,7 @@ taskForm.addEventListener("submit", async (e) => {
     if (taskName) {
         taskInput.value = "";
         const tasksCollection = collection(firestore, "tasks");
-        await addDoc(tasksCollection, { name: taskName, createdAt: new Date() });
-        
+        await addDoc(tasksCollection, { name: taskName, user: userId, createdAt: new Date() });
         // クールタイム
         isCooltime = true;
         setTimeout(() => {
