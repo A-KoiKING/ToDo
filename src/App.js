@@ -52,7 +52,7 @@ function App() {
         });
         setTask("");
       } catch (error) {
-        alert.error("タスク追加エラー:", error);
+        alert("タスク追加エラー:", error);
       }
     }
   };
