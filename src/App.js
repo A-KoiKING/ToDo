@@ -72,8 +72,8 @@ function App() {
         <div>
           <h1>ログイン</h1>
           <form onSubmit={handleLogin}>
-            <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="ユーザーID" required />
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" required />
+            <input type="text" name="userId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="ユーザーID" required />
+            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" required />
             <button type="submit">ログイン</button>
           </form>
         </div>
@@ -82,7 +82,7 @@ function App() {
           <h1>タスク管理</h1>
           <button onClick={handleLogout}>ログアウト</button>
           <form onSubmit={handleAddTask}>
-            <input type="text" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required />
+            <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required />
             <button type="submit">追加</button>
           </form>
           <ul>
