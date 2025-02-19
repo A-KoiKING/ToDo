@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { firestore, collection, addDoc, onSnapshot, deleteDoc, query, orderBy, where, getDocs } from "./firebase";
+import { firestore } from "./firebase";
+import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
 import "./App.css";
 
 function App() {
@@ -49,8 +50,13 @@ function App() {
   };
 
   const handleDeleteTask = async (id) => {
-    await deleteDoc(collection(firestore, "tasks", id));
+    try {
+      await deleteDoc(doc(firestore, "tasks", id));
+    } catch (error) {
+      alert("タスク削除エラー:", error);
+    }
   };
+  
 
   return (
     <div>
