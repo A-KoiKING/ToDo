@@ -52,7 +52,7 @@ function App() {
         });
         setTask("");
       } catch (error) {
-        alert("タスク追加エラー:", error);
+        alert("タスク追加エラー:"+ error);
       }
     }
   };
@@ -61,7 +61,7 @@ function App() {
     try {
       await deleteDoc(doc(firestore, "tasks", id));
     } catch (error) {
-      alert("タスク削除エラー:", error);
+      alert("タスク削除エラー:"+ error);
     }
   };
   
