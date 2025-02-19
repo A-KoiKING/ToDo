@@ -6,6 +6,7 @@ import "./App.css";
 function App() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -31,6 +32,7 @@ function App() {
     const userSnapshot = await getDocs(userQuery);
     
     if (!userSnapshot.empty) {
+      setUserName(userSnapshot.docs[0].data().userName);
       setIsLoggedIn(true);
     } else {
       alert("ユーザーIDまたはパスワードが間違っています");
@@ -40,6 +42,7 @@ function App() {
   const handleLogout = () => {
     setUserId("");
     setPassword("");
+    setUserName("");
     setIsLoggedIn(false);
   };
 
@@ -51,7 +54,7 @@ function App() {
       try {
         await addDoc(collection(firestore, "tasks"), { 
           name: task, 
-          user: userId, 
+          user: userName, 
           createdAt: new Date() 
         });
         setTask("");
@@ -85,6 +88,7 @@ function App() {
       ) : (
         <div>
           <h1>タスク管理</h1>
+          <p>ユーザー名: {userName}</p>
           <button onClick={handleLogout}>ログアウト</button>
           <form onSubmit={handleAddTask}>
             <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required autoComplete="off" />
@@ -93,7 +97,7 @@ function App() {
           <ul>
             {tasks.map((task) => (
               <li key={task.id}>
-                {task.user} : {task.name}
+                {task.user} : {task.name}  {task.createdAt?.toDate().toLocaleString()}
                 <button onClick={() => handleDeleteTask(task.id)}>削除</button>
               </li>
             ))}
