@@ -10,6 +10,8 @@ function App() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     if (isLoggedIn) {
       const tasksCollection = collection(firestore, "tasks");
@@ -43,6 +45,8 @@ function App() {
 
   const handleAddTask = async (e) => {
     e.preventDefault();
+    if (task.trim() === "" || isSubmitting) return;
+    setIsSubmitting(true);
     if (task.trim()) {
       try {
         await addDoc(collection(firestore, "tasks"), { 
@@ -53,6 +57,8 @@ function App() {
         setTask("");
       } catch (error) {
         alert("タスク追加エラー:"+ error);
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
@@ -65,7 +71,6 @@ function App() {
     }
   };
   
-
   return (
     <div>
       {!isLoggedIn ? (
@@ -83,7 +88,7 @@ function App() {
           <button onClick={handleLogout}>ログアウト</button>
           <form onSubmit={handleAddTask}>
             <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required />
-            <button type="submit">追加</button>
+            <button type="submit" disabled={isSubmitting}>{isSubmitting ? "追加中..." : "追加"}</button>
           </form>
           <ul>
             {tasks.map((task) => (
