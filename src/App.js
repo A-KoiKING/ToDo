@@ -30,22 +30,30 @@ function App() {
     
     if (!userSnapshot.empty) {
       setIsLoggedIn(true);
-      setUserId("");
-      setPassword("");
     } else {
       alert("ユーザーIDまたはパスワードが間違っています");
     }
   };
 
   const handleLogout = () => {
+    setUserId("");
+    setPassword("");
     setIsLoggedIn(false);
   };
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (task.trim()) {
-      await addDoc(collection(firestore, "tasks"), { name: task, user: userId, createdAt: new Date() });
-      setTask("");
+      try {
+        await addDoc(collection(firestore, "tasks"), { 
+          name: task, 
+          user: userId, 
+          createdAt: new Date() 
+        });
+        setTask("");
+      } catch (error) {
+        alert.error("タスク追加エラー:", error);
+      }
     }
   };
 
@@ -80,7 +88,7 @@ function App() {
           <ul>
             {tasks.map((task) => (
               <li key={task.id}>
-                {task.user}: {task.name}
+                {task.user} : {task.name}
                 <button onClick={() => handleDeleteTask(task.id)}>削除</button>
               </li>
             ))}
