@@ -75,30 +75,30 @@ function App() {
   };
   
   return (
-    <div>
+    <div className="container">
       {!isLoggedIn ? (
         <div>
           <h1>ログイン</h1>
-          <form onSubmit={handleLogin}>
-            <input type="text" name="userId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="ユーザーID" required autoComplete="off" />
-            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" required autoComplete="off" />
-            <button type="submit">ログイン</button>
+          <form onSubmit={handleLogin} className="form">
+            <input type="text" name="userId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="ユーザーID" required autoComplete="off" className="input"/>
+            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" required autoComplete="off" className="input"/>
+            <button type="submit" className="button">ログイン</button>
           </form>
         </div>
       ) : (
         <div>
           <h1>タスク管理</h1>
-          <p>ユーザー名: {userName}</p>
-          <button onClick={handleLogout}>ログアウト</button>
-          <form onSubmit={handleAddTask}>
-            <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required autoComplete="off" />
-            <button type="submit" disabled={isSubmitting}>{isSubmitting ? "追加中..." : "追加"}</button>
+          <label className="label">ユーザー名: {userName}</label>
+          <button onClick={handleLogout} className="button">ログアウト</button>
+          <form onSubmit={handleAddTask} className="form">
+            <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required autoComplete="off" className="input"/>
+            <button type="submit" disabled={isSubmitting} className="button">{isSubmitting ? "追加中..." : "追加"}</button>
           </form>
           <ul>
             {tasks.map((task) => (
               <li key={task.id}>
                 {task.user} : {task.name}  {task.createdAt?.toDate().toLocaleString()}
-                <button onClick={() => handleDeleteTask(task.id)}>削除</button>
+                <button onClick={() => handleDeleteTask(task.id)} className="button">削除</button>
               </li>
             ))}
           </ul>
