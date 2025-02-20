@@ -25,6 +25,16 @@ function App() {
     }
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    const savedUserId = localStorage.getItem("userId");
+    const savedUserName = localStorage.getItem("userName");
+    if (savedUserId && savedUserName) {
+      setUserId(savedUserId);
+      setUserName(savedUserName);
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const userRef = collection(firestore, "users");
@@ -33,6 +43,8 @@ function App() {
     
     if (!userSnapshot.empty) {
       setUserName(userSnapshot.docs[0].data().userName);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userName", userSnapshot.docs[0].data().userName);
       setIsLoggedIn(true);
     } else {
       alert("ユーザーIDまたはパスワードが間違っています");
@@ -44,6 +56,8 @@ function App() {
     setPassword("");
     setUserName("");
     setTask("");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
     setIsLoggedIn(false);
   };
 
@@ -79,7 +93,7 @@ function App() {
     <div className="container">
       {!isLoggedIn ? (
         <div>
-          <h1>ログイン</h1>
+          <h1>Welcome Page</h1>
           <form onSubmit={handleLogin} className="form">
             <input type="text" name="userId" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="ユーザーID" required autoComplete="off" className="input"/>
             <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード" required autoComplete="off" className="input"/>
