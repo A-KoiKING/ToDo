@@ -43,6 +43,7 @@ function App() {
     setUserId("");
     setPassword("");
     setUserName("");
+    setTask("");
     setIsLoggedIn(false);
   };
 
