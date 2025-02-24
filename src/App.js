@@ -3,6 +3,8 @@ import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
 import "./App.css";
 import LoginPage from "./components/LoginPage";
+import Sidebar from "./components/Sidebar";
+import Task from "./components/Task";
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -65,20 +67,20 @@ function App() {
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (task.trim() === "" || isSubmitting) return;
-    setIsSubmitting(true);
-    if (task.trim()) {
-      try {
-        await addDoc(collection(firestore, "tasks"), { 
-          name: task, 
-          user: userName, 
-          createdAt: new Date() 
-        });
-        setTask("");
-      } catch (error) {
-        alert("タスク追加エラー:"+ error);
-      } finally {
-        setIsSubmitting(false);
-      }
+    
+    setIsSubmitting((prev) => true);
+
+    try {
+      await addDoc(collection(firestore, "tasks"), { 
+        name: task, 
+        user: userName, 
+        createdAt: new Date() 
+      });
+      setTask("");
+    } catch (error) {
+      alert("タスク追加エラー:"+ error);
+    } finally {
+      setIsSubmitting((prev) => false);
     }
   };
 
@@ -101,22 +103,18 @@ function App() {
           setPassword={setPassword}
         />
       ) : (
-        <div>
-          <h1>タスク管理</h1>
-          <label className="label">ユーザー名: {userName}</label>
-          <button onClick={handleLogout} className="button">ログアウト</button>
-          <form onSubmit={handleAddTask} className="form">
-            <input type="text" name="task" value={task} onChange={(e) => setTask(e.target.value)} placeholder="タスクを入力してください" required autoComplete="off" className="input"/>
-            <button type="submit" disabled={isSubmitting} className="button">{isSubmitting ? "追加中..." : "追加"}</button>
-          </form>
-          <ul>
-            {tasks.map((task) => (
-              <li key={task.id}>
-                {task.user} : {task.name}  {task.createdAt?.toDate().toLocaleString()}
-                <button onClick={() => handleDeleteTask(task.id)} className="button">削除</button>
-              </li>
-            ))}
-          </ul>
+        <div className="WebApp">
+          <Sidebar />
+          <Task 
+            userName={userName}
+            handleLogout={handleLogout}
+            handleAddTask={handleAddTask}
+            task={task}
+            setTask={setTask}
+            isSubmitting={isSubmitting}
+            tasks={tasks}
+            handleDeleteTask={handleDeleteTask}
+          />
         </div>
       )}
     </div>
