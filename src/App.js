@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
 import "./App.css";
+import LoginPage from "./components/LoginPage";
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -92,16 +93,13 @@ function App() {
   return (
     <div>
       {!isLoggedIn ? (
-        <div className="container">
-          <h1 className="title">Welcome to Hakorobo</h1>
-          <form onSubmit={handleLogin} className="form">
-            <label className="login_label">ユーザーID</label>
-            <input type="text" name="userId" value={userId} onChange={(e) => setUserId(e.target.value)} required autoComplete="off" className="input"/>
-            <label className="login_label">パスワード</label>
-            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="off" className="input"/>
-            <button type="submit" className="button">ログイン</button>
-          </form>
-        </div>
+        <LoginPage
+          handleLogin={handleLogin}
+          userId={userId}
+          setUserId={setUserId}
+          password={password}
+          setPassword={setPassword}
+        />
       ) : (
         <div>
           <h1>タスク管理</h1>
