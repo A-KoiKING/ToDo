@@ -67,7 +67,7 @@ function App() {
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (task.trim() === "" || isSubmitting) return;
-    
+
     setIsSubmitting((prev) => true);
 
     try {
@@ -104,10 +104,11 @@ function App() {
         />
       ) : (
         <div className="WebApp">
-          <Sidebar />
-          <Task 
+          <Sidebar 
             userName={userName}
             handleLogout={handleLogout}
+          />
+          <Task 
             handleAddTask={handleAddTask}
             task={task}
             setTask={setTask}
