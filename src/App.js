@@ -68,7 +68,7 @@ function App() {
     e.preventDefault();
     if (task.trim() === "" || isSubmitting) return;
 
-    setIsSubmitting((prev) => true);
+    setIsSubmitting(() => true);
 
     try {
       await addDoc(collection(firestore, "tasks"), { 
@@ -80,7 +80,7 @@ function App() {
     } catch (error) {
       alert("タスク追加エラー:"+ error);
     } finally {
-      setIsSubmitting((prev) => false);
+      setIsSubmitting(() => false);
     }
   };
 
