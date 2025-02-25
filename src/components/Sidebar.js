@@ -7,6 +7,7 @@ function Sidebar({
 }) {
   return (
     <div className='Sidebar'>
+        <p className="p">ユーザー名</p>
         <label className="label">{userName}</label>
         <button onClick={handleLogout} className="button">ログアウト</button>
         <ul className='SidebarList'>
