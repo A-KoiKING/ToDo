@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
-import { HashRouter as Router, Route, Routes} from "react-router-dom";
+import { HashRouter as Router, Route, Routes, useNavigate } from "react-router-dom"; // useNavigateをインポート
 import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
@@ -14,8 +14,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -24,7 +24,6 @@ function App() {
       const unsubscribe = onSnapshot(tasksQuery, (snapshot) => {
         setTasks(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       });
-
       return () => unsubscribe();
     }
   }, [isLoggedIn]);
@@ -44,12 +43,13 @@ function App() {
     const userRef = collection(firestore, "users");
     const userQuery = query(userRef, where("userId", "==", userId), where("password", "==", password));
     const userSnapshot = await getDocs(userQuery);
-    
+
     if (!userSnapshot.empty) {
       setUserName(userSnapshot.docs[0].data().userName);
       localStorage.setItem("userId", userId);
       localStorage.setItem("userName", userSnapshot.docs[0].data().userName);
       setIsLoggedIn(true);
+      navigate("/home");
     } else {
       alert("ユーザーIDまたはパスワードが間違っています");
     }
@@ -63,23 +63,23 @@ function App() {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
+    navigate("/");
   };
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (task.trim() === "" || isSubmitting) return;
-
     setIsSubmitting(() => true);
 
     try {
-      await addDoc(collection(firestore, "tasks"), { 
-        name: task, 
-        user: userName, 
-        createdAt: new Date() 
+      await addDoc(collection(firestore, "tasks"), {
+        name: task,
+        user: userName,
+        createdAt: new Date(),
       });
       setTask("");
     } catch (error) {
-      alert("タスク追加エラー:"+ error);
+      alert("タスク追加エラー:" + error);
     } finally {
       setIsSubmitting(() => false);
     }
@@ -89,63 +89,64 @@ function App() {
     try {
       await deleteDoc(doc(firestore, "tasks", id));
     } catch (error) {
-      alert("タスク削除エラー:"+ error);
+      alert("タスク削除エラー:" + error);
     }
   };
-  
+
   return (
-    <Router>
-      <div>
-        {!isLoggedIn ? (
-          <LoginPage
-            handleLogin={handleLogin}
-            userId={userId}
-            setUserId={setUserId}
-            password={password}
-            setPassword={setPassword}
-          />
-        ) : (
-          <div className="WebApp">
-            <Sidebar 
-              userName={userName}
-              handleLogout={handleLogout}
+    <div>
+      {!isLoggedIn ? (
+        <LoginPage
+          handleLogin={handleLogin}
+          userId={userId}
+          setUserId={setUserId}
+          password={password}
+          setPassword={setPassword}
+        />
+      ) : (
+        <div className="WebApp">
+          <Sidebar userName={userName} handleLogout={handleLogout} />
+          <Routes>
+            <Route
+              path="/home"
+              element={
+                <div>
+                  Home Page
+                </div>
+              }
             />
-            <Routes>
-              <Route 
-                path="/home" 
-                element={
-                  <div>
-                    Home Page
-                  </div>
-                } 
-              />
-              <Route 
-                path="/task" 
-                element={
-                  <Task 
-                    handleAddTask={handleAddTask}
-                    task={task}
-                    setTask={setTask}
-                    isSubmitting={isSubmitting}
-                    tasks={tasks}
-                    handleDeleteTask={handleDeleteTask}
-                  />
-                } 
-              />
-              <Route 
-                path="/calendar" 
-                element={
-                  <div>
-                    Calendar Page
-                  </div>
-                } 
-              />
-            </Routes>
-          </div>
-        )}
-      </div>
-    </Router>
+            <Route
+              path="/task"
+              element={
+                <Task
+                  handleAddTask={handleAddTask}
+                  task={task}
+                  setTask={setTask}
+                  isSubmitting={isSubmitting}
+                  tasks={tasks}
+                  handleDeleteTask={handleDeleteTask}
+                />
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <div>
+                  Calendar Page
+                </div>
+              }
+            />
+          </Routes>
+        </div>
+      )}
+    </div>
   );
 }
 
-export default App;
+export default function WrappedApp() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
