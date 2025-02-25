@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
-import { HashRouter as Router} from "react-router-dom";
+import { HashRouter as Router, Route, Routes} from "react-router-dom";
 import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
@@ -110,14 +110,37 @@ function App() {
               userName={userName}
               handleLogout={handleLogout}
             />
-            <Task 
-              handleAddTask={handleAddTask}
-              task={task}
-              setTask={setTask}
-              isSubmitting={isSubmitting}
-              tasks={tasks}
-              handleDeleteTask={handleDeleteTask}
-            />
+            <Routes>
+              <Route 
+                path="/home" 
+                element={
+                  <div>
+                    Home Page
+                  </div>
+                } 
+              />
+              <Route 
+                path="/task" 
+                element={
+                  <Task 
+                    handleAddTask={handleAddTask}
+                    task={task}
+                    setTask={setTask}
+                    isSubmitting={isSubmitting}
+                    tasks={tasks}
+                    handleDeleteTask={handleDeleteTask}
+                  />
+                } 
+              />
+              <Route 
+                path="/calendar" 
+                element={
+                  <div>
+                    Calendar Page
+                  </div>
+                } 
+              />
+            </Routes>
           </div>
         )}
       </div>
