@@ -7,16 +7,16 @@ export const SidebarData = [
     {
         title: 'ホーム',
         icon: <HomeIcon />,
-        link: '/home'
+        link: '#/home'
     },
     {
         title: 'タスク',
         icon: <TaskIcon />,
-        link: '/task'
+        link: '#/task'
     },
     {
         title: 'カレンダー',
         icon: <CalendarMonthIcon />,
-        link: '/calendar'
+        link: '#/calendar'
     }
 ]

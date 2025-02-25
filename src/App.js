@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
+import { HashRouter as Router} from "react-router-dom";
 import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
@@ -93,32 +94,34 @@ function App() {
   };
   
   return (
-    <div>
-      {!isLoggedIn ? (
-        <LoginPage
-          handleLogin={handleLogin}
-          userId={userId}
-          setUserId={setUserId}
-          password={password}
-          setPassword={setPassword}
-        />
-      ) : (
-        <div className="WebApp">
-          <Sidebar 
-            userName={userName}
-            handleLogout={handleLogout}
+    <Router>
+      <div>
+        {!isLoggedIn ? (
+          <LoginPage
+            handleLogin={handleLogin}
+            userId={userId}
+            setUserId={setUserId}
+            password={password}
+            setPassword={setPassword}
           />
-          <Task 
-            handleAddTask={handleAddTask}
-            task={task}
-            setTask={setTask}
-            isSubmitting={isSubmitting}
-            tasks={tasks}
-            handleDeleteTask={handleDeleteTask}
-          />
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="WebApp">
+            <Sidebar 
+              userName={userName}
+              handleLogout={handleLogout}
+            />
+            <Task 
+              handleAddTask={handleAddTask}
+              task={task}
+              setTask={setTask}
+              isSubmitting={isSubmitting}
+              tasks={tasks}
+              handleDeleteTask={handleDeleteTask}
+            />
+          </div>
+        )}
+      </div>
+    </Router>
   );
 }
 

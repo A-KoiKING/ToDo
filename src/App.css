@@ -128,7 +128,7 @@ body {
   width: 100%;
 }
 
-.SidebarList #active {
+.SidebarList .active {
   background-color: #3b627a;
 }
 
