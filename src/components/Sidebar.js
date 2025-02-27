@@ -18,9 +18,9 @@ function Sidebar({ userName, handleLogout }) {
 
   return (
     <div className="Sidebar">
-      <p className="p">ユーザー名</p>
-      <label className="label">{userName}</label>
-      <button onClick={handleLogout} className="button">ログアウト</button>
+      <p className="Sidebar-p">ユーザー名</p>
+      <label className="Sidebar-label">{userName}</label>
+      <button onClick={handleLogout} className="Sidebar-button">ログアウト</button>
       <ul className="SidebarList">
         {SidebarData.map((value, key) => (
           <li 

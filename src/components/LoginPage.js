@@ -3,11 +3,11 @@ import React from 'react'
 function LoginPage({ handleLogin, userId, setUserId, password, setPassword }) {
   return (
     <div className="loginpage">
-        <h1 className="title">
+        <h1 className="loginpage-title">
             Welcome to Hakorobo
         </h1>
-        <form onSubmit={handleLogin} className="form">
-            <label className="label">
+        <form onSubmit={handleLogin} className="loginpage-form">
+            <label className="loginpage-label">
                 ユーザーID
             </label>
             <input 
@@ -17,9 +17,9 @@ function LoginPage({ handleLogin, userId, setUserId, password, setPassword }) {
                 onChange={(e) => setUserId(e.target.value)} 
                 required 
                 autoComplete="off" 
-                className="input"
+                className="loginpage-input"
             />
-            <label className="label">
+            <label className="loginpage-label">
                 パスワード
             </label>
             <input 
@@ -29,9 +29,9 @@ function LoginPage({ handleLogin, userId, setUserId, password, setPassword }) {
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
                 autoComplete="off" 
-                className="input"
+                className="loginpage-input"
             />
-            <button type="submit" className="button">
+            <button type="submit" className="loginpage-button">
                 ログイン
             </button>
         </form>
