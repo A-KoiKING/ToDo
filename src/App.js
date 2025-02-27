@@ -35,6 +35,7 @@ function App() {
       setUserId(savedUserId);
       setUserName(savedUserName);
       setIsLoggedIn(true);
+      navigate("/home");
     }
   }, []);
 
