@@ -51,7 +51,7 @@ function App() {
       setIsLoggedIn(true);
       navigate("/home");
     } else {
-      alert("ユーザーIDまたはパスワードが間違っています");
+      console.log("ユーザーIDまたはパスワードが間違っています");
     }
   };
 
@@ -79,7 +79,7 @@ function App() {
       });
       setTask("");
     } catch (error) {
-      alert("タスク追加エラー:" + error);
+      console.log("タスク追加エラー:" + error);
     } finally {
       setIsSubmitting(() => false);
     }
@@ -89,7 +89,7 @@ function App() {
     try {
       await deleteDoc(doc(firestore, "tasks", id));
     } catch (error) {
-      alert("タスク削除エラー:" + error);
+      console.log("タスク削除エラー:" + error);
     }
   };
 
