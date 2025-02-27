@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
-import { HashRouter as Router, Route, Routes, useNavigate } from "react-router-dom"; // useNavigateをインポート
+import { HashRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
@@ -15,6 +15,7 @@ function App() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +38,7 @@ function App() {
       setIsLoggedIn(true);
       navigate("/home");
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -70,7 +71,7 @@ function App() {
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (task.trim() === "" || isSubmitting) return;
-    setIsSubmitting(() => true);
+    setIsSubmitting(true);
 
     try {
       await addDoc(collection(firestore, "tasks"), {
@@ -82,7 +83,7 @@ function App() {
     } catch (error) {
       console.log("タスク追加エラー:" + error);
     } finally {
-      setIsSubmitting(() => false);
+      setIsSubmitting(false);
     }
   };
 
@@ -92,6 +93,10 @@ function App() {
     } catch (error) {
       console.log("タスク削除エラー:" + error);
     }
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
@@ -106,38 +111,34 @@ function App() {
         />
       ) : (
         <div className="WebApp">
-          <Sidebar userName={userName} handleLogout={handleLogout} />
-          <Routes>
-            <Route
-              path="/home"
-              element={
-                <div>
-                  Home Page
-                </div>
-              }
-            />
-            <Route
-              path="/task"
-              element={
-                <Task
-                  handleAddTask={handleAddTask}
-                  task={task}
-                  setTask={setTask}
-                  isSubmitting={isSubmitting}
-                  tasks={tasks}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <div>
-                  Calendar Page
-                </div>
-              }
-            />
-          </Routes>
+          <button className="menu-toggle" onClick={toggleSidebar}>
+            {isSidebarOpen ? "✕" : "☰"}
+          </button>
+          <Sidebar
+            userName={userName}
+            handleLogout={handleLogout}
+            isOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+          />
+          <div className="main-content">
+            <Routes>
+              <Route path="/home" element={<div>Home Page</div>} />
+              <Route
+                path="/task"
+                element={
+                  <Task
+                    handleAddTask={handleAddTask}
+                    task={task}
+                    setTask={setTask}
+                    isSubmitting={isSubmitting}
+                    tasks={tasks}
+                    handleDeleteTask={handleDeleteTask}
+                  />
+                }
+              />
+              <Route path="/calendar" element={<div>Calendar Page</div>} />
+            </Routes>
+          </div>
         </div>
       )}
     </div>

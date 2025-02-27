@@ -1,9 +1,9 @@
-// Sidebar.js
 import React, { useState, useEffect } from 'react';
 import { SidebarData } from './SidebarData';
 import Confirm from './Confirm';
+import './Sidebar.css';
 
-function Sidebar({ userName, handleLogout }) {
+function Sidebar({ userName, handleLogout, isOpen, toggleSidebar }) {
   const [activeLink, setActiveLink] = useState(window.location.hash);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
@@ -29,11 +29,11 @@ function Sidebar({ userName, handleLogout }) {
   };
 
   return (
-    <div className="Sidebar">
+    <div className={`Sidebar ${isOpen ? 'open' : ''}`}>
       <p className="Sidebar-p">ユーザー名</p>
       <label className="Sidebar-label">{userName}</label>
       <button
-        onClick={() => setIsConfirmOpen(true)} 
+        onClick={() => setIsConfirmOpen(true)}
         className="Sidebar-button"
       >
         ログアウト
@@ -43,7 +43,10 @@ function Sidebar({ userName, handleLogout }) {
           <li
             key={key}
             className={`row ${activeLink === value.link ? "active" : ""}`}
-            onClick={() => { window.location.hash = value.link; }}
+            onClick={() => {
+              window.location.hash = value.link;
+              toggleSidebar();
+            }}
           >
             <div id="icon">{value.icon}</div>
             <div id="title">{value.title}</div>
