@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { firestore } from "./firebase";
 import { deleteDoc, doc, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "firebase/firestore";
-import { HashRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
+import { HashRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
@@ -17,6 +17,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -36,9 +37,19 @@ function App() {
       setUserId(savedUserId);
       setUserName(savedUserName);
       setIsLoggedIn(true);
-      navigate("/home");
+
+      // 現在のURLが有効なルートかどうかをチェック
+      const validRoutes = ["/home", "/task", "/calendar"];
+      const currentPath = location.pathname;
+
+      // 有効なルートでない場合のみ /home にリダイレクト
+      if (!validRoutes.includes(currentPath)) {
+        navigate("/home");
+      }
+      // 有効なルート（/home, /task, /calendar）の場合は何もしない（現在のURLを維持）
     }
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
