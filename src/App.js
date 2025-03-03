@@ -144,7 +144,14 @@ function App() {
           />
           <div className="main-content">
             <Routes>
-              <Route path="/home" element={<div>Home Page</div>} />
+              <Route 
+                path="/home" 
+                element={
+                  <div>
+                    Home Page
+                  </div>
+                } 
+              />
               <Route
                 path="/task"
                 element={
@@ -158,7 +165,14 @@ function App() {
                   />
                 }
               />
-              <Route path="/calendar" element={<div>Calendar Page</div>} />
+              <Route 
+                path="/calendar" 
+                element={
+                  <div>
+                    Calendar Page
+                  </div>
+                } 
+              />
             </Routes>
           </div>
           {isConfirmOpen && (
