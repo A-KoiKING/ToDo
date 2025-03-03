@@ -1,87 +1,89 @@
+/* src/components/Sidebar.css */
 .Sidebar {
-    height: 100vh;
-    width: 250px;
-    background-color: #2d445b;
-    position: fixed;
-    top: 0;
-    left: 0;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(-100%); /* デフォルトで隠す */
-    z-index: 1000;
+  height: 100vh;
+  width: 250px;
+  background-color: #2d445b;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(-100%);
+  z-index: 1000;
+}
+
+.Sidebar.open {
+  transform: translateX(0);
+}
+
+/* 以下は既存のスタイル */
+.Sidebar-p {
+  display: block;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 0;
+  color: white;
+}
+
+.Sidebar-label {
+  display: block;
+  font-weight: bold;
+  font-size: 40px;
+  padding: 20px;
+  padding-top: 0px;
+  text-align: center;
+  color: white;
+}
+
+.Sidebar-button {
+  display: block;
+  width: 80%;
+  padding: 5px 0;
+  background-color: #2d445b;
+  color: white;
+  border: 1px solid #ddd;
+  margin: 0px auto 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.SidebarList {
+  height: auto;
+  padding: 0;
+  width: 100%;
+}
+
+.SidebarList .active {
+  background-color: #3b627a;
+}
+
+.SidebarList .row {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  color: white;
+  justify-content: center;
+  align-items: center;
+}
+
+.SidebarList .row:hover {
+  cursor: pointer;
+  background-color: #3b627a;
+}
+
+.row #icon {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+}
+
+.row #title {
+  flex: 70%;
+}
+
+@media (min-width: 769px) {
+  .Sidebar {
+    transform: translateX(0);
+    position: static;
   }
-  
-  .Sidebar.open {
-    transform: translateX(0); /* 表示時にスライドイン */
-  }
-  
-  .Sidebar-p {
-    display: block;
-    font-size: 15px;
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 0;
-    color: white;
-  }
-  
-  .Sidebar-label {
-    display: block;
-    font-weight: bold;
-    font-size: 40px;
-    padding: 20px;
-    padding-top: 0px;
-    text-align: center;
-    color: white;
-  }
-  
-  .Sidebar-button {
-    display: block;
-    width: 80%;
-    padding: 5px 0;
-    background-color: #2d445b;
-    color: white;
-    border: 1px solid #ddd;
-    margin: 0px auto 10px;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-  
-  .SidebarList {
-    height: auto;
-    padding: 0;
-    width: 100%;
-  }
-  
-  .SidebarList .active {
-    background-color: #3b627a;
-  }
-  
-  .SidebarList .row {
-    width: 100%;
-    height: 60px;
-    display: flex;
-    color: white;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .SidebarList .row:hover {
-    cursor: pointer;
-    background-color: #3b627a;
-  }
-  
-  .row #icon {
-    flex: 30%;
-    display: grid;
-    place-items: center;
-  }
-  
-  .row #title {
-    flex: 70%;
-  }
-  
-  @media (min-width: 769px) {
-    .Sidebar {
-      transform: translateX(0); /* デスクトップでは常に表示 */
-      position: static;
-    }
-  }
+}

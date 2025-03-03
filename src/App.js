@@ -145,11 +145,16 @@ function App() {
           />
           <div className="main-content">
             <Routes>
-              <Route 
-                path="/home" 
+              <Route
+                path="/home"
                 element={
-                  <Home/>
-                } 
+                  <Home
+                    lastUpdated="2025-03-03"
+                    version="0.1.0"
+                    notice="Home Pageを更新しました！"
+                    targetDate="2025-09-28T13:00:00"
+                  />
+                }
               />
               <Route
                 path="/task"
@@ -164,13 +169,13 @@ function App() {
                   />
                 }
               />
-              <Route 
-                path="/calendar" 
+              <Route
+                path="/calendar"
                 element={
                   <div>
                     Calendar Page
                   </div>
-                } 
+                }
               />
             </Routes>
           </div>
