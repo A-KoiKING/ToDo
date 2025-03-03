@@ -35,3 +35,10 @@ body {
   cursor: pointer;
   font-size: 18px;
 }
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block; /* スマホサイズで表示 */
+  }
+}
