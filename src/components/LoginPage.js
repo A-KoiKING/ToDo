@@ -1,4 +1,5 @@
 import React from 'react'
+import './LoginPage.css';
 
 function LoginPage({ handleLogin, userId, setUserId, password, setPassword }) {
   return (
