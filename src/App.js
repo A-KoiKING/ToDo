@@ -149,7 +149,7 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.1.3"
+                    version="0.1.2"
                     lastUpdated="2025-03-03"
                     notice="Home Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
