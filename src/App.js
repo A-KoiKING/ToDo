@@ -8,6 +8,7 @@ import Sidebar from "./components/Sidebar";
 import Task from "./components/Task";
 import Confirm from "./components/Confirm";
 import Home from "./components/Home";
+import CalendarComponent from './components/Calendar';
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -149,9 +150,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.1.3"
-                    lastUpdated="2025-03-03"
-                    notice="Home Pageを更新しました!"
+                    version="0.1.4"
+                    lastUpdated="2025-03-04"
+                    notice="Calendar Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }
@@ -172,9 +173,7 @@ function App() {
               <Route
                 path="/calendar"
                 element={
-                  <div>
-                    Calendar Page
-                  </div>
+                  <CalendarComponent userName={userName}/>
                 }
               />
             </Routes>
