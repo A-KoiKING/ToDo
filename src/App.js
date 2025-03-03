@@ -48,6 +48,8 @@ function App() {
         navigate("/home");
       }
     }
+    // 下のコメントはuseEffectの第二引数に何も入れていないとエラーになるので、無視するという意味
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = async (e) => {
