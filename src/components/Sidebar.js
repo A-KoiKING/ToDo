@@ -33,7 +33,7 @@ function Sidebar({ userName, handleLogout, isOpen, toggleSidebar }) {
       <p className="Sidebar-p">ユーザー名</p>
       <label className="Sidebar-label">{userName}</label>
       <button
-        onClick={() => setIsConfirmOpen(true)}
+        onClick={handleLogout}
         className="Sidebar-button"
       >
         ログアウト

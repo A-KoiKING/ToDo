@@ -6,6 +6,7 @@ import "./App.css";
 import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
 import Task from "./components/Task";
+import Confirm from "./components/Confirm";
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -16,6 +17,7 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,22 +35,19 @@ function App() {
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
     const savedUserName = localStorage.getItem("userName");
+
     if (savedUserId && savedUserName) {
       setUserId(savedUserId);
       setUserName(savedUserName);
       setIsLoggedIn(true);
 
-      // 現在のURLが有効なルートかどうかをチェック
       const validRoutes = ["/home", "/task", "/calendar"];
       const currentPath = location.pathname;
 
-      // 有効なルートでない場合のみ /home にリダイレクト
       if (!validRoutes.includes(currentPath)) {
         navigate("/home");
       }
-      // 有効なルート（/home, /task, /calendar）の場合は何もしない（現在のURLを維持）
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = async (e) => {
@@ -77,6 +76,11 @@ function App() {
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
     navigate("/");
+    setIsConfirmOpen(false);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleAddTask = async (e) => {
@@ -106,8 +110,12 @@ function App() {
     }
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const openConfirm = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    setIsConfirmOpen(false);
   };
 
   return (
@@ -127,7 +135,7 @@ function App() {
           </button>
           <Sidebar
             userName={userName}
-            handleLogout={handleLogout}
+            handleLogout={openConfirm}
             isOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
           />
@@ -150,6 +158,13 @@ function App() {
               <Route path="/calendar" element={<div>Calendar Page</div>} />
             </Routes>
           </div>
+          {isConfirmOpen && (
+            <Confirm
+              message="本当にログアウトしますか？"
+              onConfirm={handleLogout}
+              onCancel={closeConfirm}
+            />
+          )}
         </div>
       )}
     </div>
