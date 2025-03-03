@@ -9,10 +9,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%; /* 親要素にフィット */
     box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    /* position: absolute; と transform を削除 */
   }
   
   .home h1 {
