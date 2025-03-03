@@ -9,10 +9,24 @@
     width: 100%;
     box-sizing: border-box;
   }
-  
+
   .home h1 {
+    font-size: 3rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .home .title-part {
+    white-space: nowrap;
+  }
+  
+  .home h2 {
     font-size: 1.5rem;
-    color: #2d445b;
+    color: #333;
     text-align: center;
     margin-bottom: 20px;
   }
@@ -25,10 +39,10 @@
   }
   
   .home p strong {
-    color: #555;
+    color: #333;
     font-weight: 600;
   }
-  
+
   .home p.timer {
     font-size: 3rem;
     font-weight: bold;
@@ -38,9 +52,35 @@
     border-radius: 6px;
     text-align: center;
     margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
   }
   
   .home p.timer.expired {
     color: #f44336;
     background-color: #ffebee;
+  }
+
+  .time-group {
+    display: inline-flex;
+    white-space: nowrap;
+  }
+  
+  .time-part {
+    white-space: nowrap;
+  }
+  
+  @media (max-width: 768px) {
+    .home h1 {
+      font-size: 2.5rem;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .home p.timer {
+      flex-direction: column;
+      align-items: center;
+    }
   }

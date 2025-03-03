@@ -67,15 +67,32 @@ function Home({ lastUpdated, version, notice, targetDate }) {
 
   const { days, hours, minutes, seconds, isExpired } = timeLeft;
 
+  const formatTime = (value) => String(value).padStart(2, '0');
+
   return (
     <div className="home">
-      <h1>地区大会まで</h1>
+      <h1>
+        <span className="title-part">函館高専</span>
+        <span className="title-part">ロボット研究会</span>
+      </h1>
+      <h2>地区大会まで</h2>
       {targetDate && (
         <p className={`timer ${isExpired ? 'expired' : ''}`}>
-          {isExpired
-            ? '期限が過ぎています'
-            : `${days}日 ${hours}時間 ${minutes}分 ${seconds}秒`}
-        </p>
+        {isExpired ? (
+          '期限が過ぎています'
+        ) : (
+          <>
+              <span className="time-group">
+                <span className="time-part">{formatTime(days)}日 </span>
+                <span className="time-part">{formatTime(hours)}時間</span>
+              </span>
+              <span className="time-group">
+                <span className="time-part">{formatTime(minutes)}分 </span>
+                <span className="time-part">{formatTime(seconds)}秒</span>
+              </span>
+          </>
+        )}
+      </p>
       )}
       <p><strong>お知らせ:</strong> {notice || 'お知らせはありません'}</p>
       <p><strong>バージョン:</strong> {version || '未設定'}</p>
