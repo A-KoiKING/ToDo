@@ -79,6 +79,7 @@ function App() {
     setIsLoggedIn(false);
     navigate("/");
     setIsConfirmOpen(false);
+    setIsSidebarOpen(false);
   };
 
   const toggleSidebar = () => {
