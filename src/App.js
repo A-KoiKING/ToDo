@@ -7,6 +7,7 @@ import LoginPage from "./components/LoginPage";
 import Sidebar from "./components/Sidebar";
 import Task from "./components/Task";
 import Confirm from "./components/Confirm";
+import Home from "./components/Home";
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -147,9 +148,7 @@ function App() {
               <Route 
                 path="/home" 
                 element={
-                  <div>
-                    Home Page
-                  </div>
+                  <Home/>
                 } 
               />
               <Route
