@@ -7,7 +7,7 @@ body {
 
 .WebApp {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   width: 100%;
 }
 
@@ -19,6 +19,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100dvh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .menu-toggle {
