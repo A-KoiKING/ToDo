@@ -150,8 +150,8 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.1.4"
-                    lastUpdated="2025-03-04"
+                    version="0.1.5"
+                    lastUpdated="2025-03-05"
                     notice="Calendar Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
                   />
@@ -173,7 +173,7 @@ function App() {
               <Route
                 path="/calendar"
                 element={
-                  <CalendarComponent userName={userName}/>
+                  <CalendarComponent/>
                 }
               />
             </Routes>

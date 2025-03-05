@@ -1,134 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { firestore } from '../firebase';
-import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
-import Confirm from './Confirm';
 import './Calendar.css';
+import { firestore } from '../firebase'; // Firebase 設定をインポート
+import { collection, getDocs } from 'firebase/firestore';
 
-function CalendarComponent({ userName }) {
+function CalendarComponent() {
   const [date, setDate] = useState(new Date());
-  const [activities, setActivities] = useState({});
-  const [absentees, setAbsentees] = useState([]);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [viewDate, setViewDate] = useState(new Date()); // カレンダーの表示される月を管理
+  const [activityDays, setActivityDays] = useState([]); // 活動日リスト
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchActivityDays = async () => {
       try {
-        const activitiesCollection = collection(firestore, 'activities');
-        const activitiesSnapshot = await getDocs(activitiesCollection);
-        const activitiesData = {};
-        activitiesSnapshot.forEach(doc => {
-          const data = doc.data();
-          activitiesData[data.date] = { time: data.time, color: getColor(data.time) };
-        });
-        setActivities(activitiesData);
-
-        const nextActivityDate = getNextActivityDate(activitiesData);
-        if (nextActivityDate) {
-          const absenteesQuery = query(
-            collection(firestore, 'absences'),
-            where('date', '==', nextActivityDate)
-          );
-          const absenteesSnapshot = await getDocs(absenteesQuery);
-          const absenteeList = absenteesSnapshot.docs.map(doc => doc.data().user);
-          setAbsentees(absenteeList);
-        } else {
-          setAbsentees([]);
-        }
+        const querySnapshot = await getDocs(collection(firestore, 'activities'));
+        const days = querySnapshot.docs.map(doc => doc.id); // ドキュメントIDを日付として取得（"YYYY-MM-DD"形式を想定）
+        setActivityDays(days);
       } catch (error) {
-        console.error('データ取得エラー:', error); // 必要最低限のエラー出力
+        console.error('活動日の取得エラー:', error);
       }
     };
-    fetchData();
+
+    fetchActivityDays();
   }, []);
 
-  const getColor = (time) => {
-    if (time >= 5) return '#ff4d4d'; // 5時間以上: 赤
-    if (time >= 3) return '#ffcc00'; // 3時間以上: 黄色
-    return '#00cc00'; // それ以外: 緑
+  const onChange = (newDate) => {
+    setDate(newDate);
   };
 
-  const getNextActivityDate = (activitiesData) => {
-    const today = new Date();
-    const dates = Object.keys(activitiesData)
-      .map(d => new Date(d))
-      .filter(d => d >= today)
-      .sort((a, b) => a - b);
-    return dates[0]?.toISOString().split('T')[0] || null;
+  const handleNextMonth = () => {
+    const nextMonth = new Date(viewDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    setViewDate(nextMonth);
   };
 
-  const handleDayClick = (value) => {
-    setSelectedDate(value);
-    setIsConfirmOpen(true);
+  const handlePrevMonth = () => {
+    const prevMonth = new Date(viewDate);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    setViewDate(prevMonth);
   };
 
-  const handleSubmitAbsence = async () => {
-    if (!selectedDate) return;
-    const dateStr = selectedDate.toISOString().split('T')[0];
-    try {
-      await addDoc(collection(firestore, 'absences'), {
-        date: dateStr,
-        user: userName,
-      });
+  // 現在の年月
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0-based（3月は2）
 
-      const nextActivityDate = getNextActivityDate(activities);
-      if (dateStr === nextActivityDate) {
-        setAbsentees([...absentees, userName]);
-      }
-      setIsConfirmOpen(false);
-    } catch (error) {
-      console.error('欠席提出エラー:', error); // 必要最低限のエラー出力
-    }
+  // minDate（現在の月の1日）と maxDate（次の月の最終日）
+  const minDate = new Date(currentYear, currentMonth, 1);
+  const maxDate = new Date(currentYear, currentMonth + 2, 0);
+
+  // タイルの無効化（現在表示している月以外の日付を無効化）
+  const tileDisabled = ({ date }) => {
+    return date.getMonth() !== viewDate.getMonth();
   };
 
+  // タイルのスタイル変更（活動日を赤色にする）
   const tileClassName = ({ date }) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return activities[dateStr] ? 'activity-tile' : null;
-  };
-
-  const tileContent = ({ date }) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return activities[dateStr] ? (
-      <div style={{ backgroundColor: activities[dateStr].color, height: '100%' }} />
-    ) : null;
+    const formattedDate = date.toISOString().split('T')[0]; // "YYYY-MM-DD" 形式
+    return activityDays.includes(formattedDate) ? 'active-day' : '';
   };
 
   return (
-    <div className="calendar-page">
-      <div className="absentees-list">
-        <h3>次の活動日の欠席者</h3>
-        {absentees.length > 0 ? (
-          <ul>
-            {absentees.map((absentee, index) => (
-              <li key={index}>{absentee}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>欠席者なし</p>
-        )}
+    <div>
+      <div className="custom-navigation">
+        <button 
+          onClick={handlePrevMonth} 
+          disabled={viewDate.getFullYear() === currentYear && viewDate.getMonth() === currentMonth}
+        >
+          前の月へ
+        </button>
+        <div className="custom-navigation-label">
+          {`${viewDate.getFullYear()}/${viewDate.getMonth() + 1}`}
+        </div>
+        <button 
+          onClick={handleNextMonth} 
+          disabled={viewDate.getFullYear() === maxDate.getFullYear() && viewDate.getMonth() === maxDate.getMonth()}
+        >
+          次の月へ
+        </button>
       </div>
-      <div className="calendar-container">
-        <Calendar
-          onChange={setDate}
-          value={date}
-          tileClassName={tileClassName}
-          tileContent={tileContent}
-          onClickDay={handleDayClick}
-          minDate={new Date()}
-          maxDate={new Date(new Date().setMonth(new Date().getMonth() + 2))}
-          view="month"
-          navigation={true}
-        />
-      </div>
-      {isConfirmOpen && (
-        <Confirm
-          message={`${selectedDate?.toLocaleDateString()} の欠席を提出しますか？`}
-          onConfirm={handleSubmitAbsence}
-          onCancel={() => setIsConfirmOpen(false)}
-        />
-      )}
+      <Calendar
+        onChange={onChange}
+        value={date}
+        locale="ja-JP"
+        showNavigation={false}
+        minDate={minDate}
+        maxDate={maxDate}
+        tileDisabled={tileDisabled}
+        activeStartDate={viewDate} // カレンダーの表示を制御
+        onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)} // 月が変わったら反映
+        tileClassName={tileClassName} // 活動日を赤色にする
+      />
+      <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
     </div>
   );
 }
