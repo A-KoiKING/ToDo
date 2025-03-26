@@ -5,9 +5,9 @@ import { firestore } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
 function CalendarComponent() {
-  const [date, setDate] = useState(new Date()); // 選択された日付
-  const [viewDate, setViewDate] = useState(new Date()); // 表示中の月
-  const [activityDays, setActivityDays] = useState([]); // 活動日リスト
+  const [date, setDate] = useState(new Date());
+  const [viewDate, setViewDate] = useState(new Date());
+  const [activityDays, setActivityDays] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -49,16 +49,22 @@ function CalendarComponent() {
     setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
-  // 現在の年月
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth();
-  const minDate = new Date(currentYear, currentMonth, 1);
-  const maxDate = new Date(currentYear, currentMonth + 2, 0);
+  const isHoliday = (date) => {
+    const holidays = [
+      '2025-01-01', '2025-02-11', '2025-04-29', '2025-05-03', '2025-05-04', '2025-05-05',
+      '2025-07-15', '2025-08-11', '2025-09-16', '2025-09-23', '2025-11-03', '2025-11-23'
+    ];
+    return holidays.includes(date.toISOString().split('T')[0]);
+  };
 
-  // タイルのスタイル変更（活動日にのみ下線）
   const tileClassName = ({ date }) => {
     const formattedDate = date.toLocaleDateString('en-CA');
-    return activityDays.includes(formattedDate) ? 'active-day' : '';
+    if (activityDays.includes(formattedDate)) return 'active-day';
+
+    const dayOfWeek = date.getDay(); // 0: 日, 1: 月, ..., 6: 土
+    if (dayOfWeek === 6) return 'saturday'; // 土曜日
+    if (dayOfWeek === 0 || isHoliday(date)) return 'sunday-holiday'; // 日曜日・祝日
+    return '';
   };
 
   return (
@@ -66,7 +72,7 @@ function CalendarComponent() {
       <div className="custom-navigation">
         <button
           onClick={handlePrevMonth}
-          disabled={viewDate.getFullYear() === currentYear && viewDate.getMonth() === currentMonth}
+          disabled={viewDate.getFullYear() === new Date().getFullYear() && viewDate.getMonth() === new Date().getMonth()}
           className="nav-button"
         >
           前の月へ
@@ -76,7 +82,6 @@ function CalendarComponent() {
         </div>
         <button
           onClick={handleNextMonth}
-          disabled={viewDate.getFullYear() === maxDate.getFullYear() && viewDate.getMonth() === maxDate.getMonth()}
           className="nav-button"
         >
           次の月へ
@@ -87,12 +92,11 @@ function CalendarComponent() {
         value={date}
         locale="ja-JP"
         showNavigation={false}
-        minDate={minDate}
-        maxDate={maxDate}
         activeStartDate={viewDate}
         onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)}
         tileClassName={tileClassName}
-        showNeighboringMonth={false} // ★これが重要
+        showNeighboringMonth={false} // ★現在の月以外は表示しない
+        formatShortWeekday={(locale, date) => ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}
       />
       <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
     </div>
