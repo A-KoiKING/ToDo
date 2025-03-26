@@ -53,9 +53,9 @@ function CalendarComponent() {
     const formattedDate = date.toLocaleDateString('en-CA');
     if (activityDays.includes(formattedDate)) return 'active-day';
 
-    const dayOfWeek = date.getDay(); // 0: 日, 1: 月, ..., 6: 土
-    if (dayOfWeek === 6) return 'saturday'; // 土曜日
-    if (dayOfWeek === 0) return 'sunday'; // 日曜日
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek === 6) return 'saturday';
+    if (dayOfWeek === 0) return 'sunday';
     return '';
   };
 
@@ -87,7 +87,7 @@ function CalendarComponent() {
         activeStartDate={viewDate}
         onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)}
         tileClassName={tileClassName}
-        showNeighboringMonth={false} // ★現在の月以外は表示しない
+        showNeighboringMonth={false}
         formatShortWeekday={(locale, date) => ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}
       />
       <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
