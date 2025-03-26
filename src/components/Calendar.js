@@ -42,11 +42,21 @@ function CalendarComponent() {
   };
 
   const handleNextMonth = () => {
-    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    const currentDate = new Date();
+    const maxMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+
+    if (viewDate < maxMonth) {
+      setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    }
   };
 
   const handlePrevMonth = () => {
-    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    const currentDate = new Date();
+    const minMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+    if (viewDate > minMonth) {
+      setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    }
   };
 
   const tileClassName = ({ date }) => {
@@ -74,6 +84,7 @@ function CalendarComponent() {
         </div>
         <button
           onClick={handleNextMonth}
+          disabled={viewDate.getFullYear() === new Date().getFullYear() && viewDate.getMonth() === new Date().getMonth() + 1}
           className="nav-button"
         >
           次の月へ
