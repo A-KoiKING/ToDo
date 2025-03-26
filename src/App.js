@@ -150,8 +150,8 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.1.5"
-                    lastUpdated="2025-03-05"
+                    version="0.1.6"
+                    lastUpdated="2025-03-26"
                     notice="Calendar Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
                   />

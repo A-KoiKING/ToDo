@@ -5,22 +5,36 @@ import { firestore } from '../firebase'; // Firebase 設定をインポート
 import { collection, getDocs } from 'firebase/firestore';
 
 function CalendarComponent() {
-  const [date, setDate] = useState(new Date());
-  const [viewDate, setViewDate] = useState(new Date()); // カレンダーの表示される月を管理
+  const [date, setDate] = useState(new Date()); // 選択された日付
+  const [viewDate, setViewDate] = useState(new Date()); // 表示中の月
   const [activityDays, setActivityDays] = useState([]); // 活動日リスト
 
   useEffect(() => {
+    let mounted = true; // コンポーネントがマウントされているかどうかを追跡
+
     const fetchActivityDays = async () => {
       try {
         const querySnapshot = await getDocs(collection(firestore, 'activities'));
-        const days = querySnapshot.docs.map(doc => doc.id); // ドキュメントIDを日付として取得（"YYYY-MM-DD"形式を想定）
-        setActivityDays(days);
+        const days = querySnapshot.docs
+          .map(doc => {
+            const id = doc.id;
+            return /^\d{4}-\d{2}-\d{2}$/.test(id) ? id : null;
+          })
+          .filter(day => day !== null);
+
+        if (mounted) {
+          setActivityDays(days);
+        }
       } catch (error) {
         console.error('活動日の取得エラー:', error);
       }
     };
 
     fetchActivityDays();
+
+    return () => {
+      mounted = false; // クリーンアップ時にマウントフラグを解除
+    };
   }, []);
 
   const onChange = (newDate) => {
@@ -28,15 +42,11 @@ function CalendarComponent() {
   };
 
   const handleNextMonth = () => {
-    const nextMonth = new Date(viewDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    setViewDate(nextMonth);
+    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
   const handlePrevMonth = () => {
-    const prevMonth = new Date(viewDate);
-    prevMonth.setMonth(prevMonth.getMonth() - 1);
-    setViewDate(prevMonth);
+    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
   // 現在の年月
@@ -48,31 +58,31 @@ function CalendarComponent() {
   const maxDate = new Date(currentYear, currentMonth + 2, 0);
 
   // タイルの無効化（現在表示している月以外の日付を無効化）
-  const tileDisabled = ({ date }) => {
-    return date.getMonth() !== viewDate.getMonth();
-  };
+  const tileDisabled = ({ date }) => date.getMonth() !== viewDate.getMonth();
 
-  // タイルのスタイル変更（活動日を赤色にする）
+  // タイルのスタイル変更（活動日にのみ下線）
   const tileClassName = ({ date }) => {
-    const formattedDate = date.toISOString().split('T')[0]; // "YYYY-MM-DD" 形式
+    const formattedDate = date.toLocaleDateString('en-CA'); // "YYYY-MM-DD" 形式（ローカルタイム）
     return activityDays.includes(formattedDate) ? 'active-day' : '';
   };
 
   return (
     <div>
       <div className="custom-navigation">
-        <button 
-          onClick={handlePrevMonth} 
+        <button
+          onClick={handlePrevMonth}
           disabled={viewDate.getFullYear() === currentYear && viewDate.getMonth() === currentMonth}
+          className="nav-button"
         >
           前の月へ
         </button>
         <div className="custom-navigation-label">
-          {`${viewDate.getFullYear()}/${viewDate.getMonth() + 1}`}
+          {viewDate.getFullYear()}/{viewDate.getMonth() + 1}
         </div>
-        <button 
-          onClick={handleNextMonth} 
+        <button
+          onClick={handleNextMonth}
           disabled={viewDate.getFullYear() === maxDate.getFullYear() && viewDate.getMonth() === maxDate.getMonth()}
+          className="nav-button"
         >
           次の月へ
         </button>
@@ -85,9 +95,9 @@ function CalendarComponent() {
         minDate={minDate}
         maxDate={maxDate}
         tileDisabled={tileDisabled}
-        activeStartDate={viewDate} // カレンダーの表示を制御
-        onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)} // 月が変わったら反映
-        tileClassName={tileClassName} // 活動日を赤色にする
+        activeStartDate={viewDate}
+        onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)}
+        tileClassName={tileClassName}
       />
       <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
     </div>
