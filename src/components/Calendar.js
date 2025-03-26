@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import './Calendar.css';
-import { firestore } from '../firebase'; // Firebase 設定をインポート
+import { firestore } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
 function CalendarComponent() {
@@ -10,7 +10,7 @@ function CalendarComponent() {
   const [activityDays, setActivityDays] = useState([]); // 活動日リスト
 
   useEffect(() => {
-    let mounted = true; // コンポーネントがマウントされているかどうかを追跡
+    let mounted = true;
 
     const fetchActivityDays = async () => {
       try {
@@ -33,7 +33,7 @@ function CalendarComponent() {
     fetchActivityDays();
 
     return () => {
-      mounted = false; // クリーンアップ時にマウントフラグを解除
+      mounted = false;
     };
   }, []);
 
@@ -51,18 +51,13 @@ function CalendarComponent() {
 
   // 現在の年月
   const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0-based（3月は2）
-
-  // minDate（現在の月の1日）と maxDate（次の月の最終日）
+  const currentMonth = new Date().getMonth();
   const minDate = new Date(currentYear, currentMonth, 1);
   const maxDate = new Date(currentYear, currentMonth + 2, 0);
 
-  // タイルの無効化（現在表示している月以外の日付を無効化）
-  const tileDisabled = ({ date }) => date.getMonth() !== viewDate.getMonth();
-
   // タイルのスタイル変更（活動日にのみ下線）
   const tileClassName = ({ date }) => {
-    const formattedDate = date.toLocaleDateString('en-CA'); // "YYYY-MM-DD" 形式（ローカルタイム）
+    const formattedDate = date.toLocaleDateString('en-CA');
     return activityDays.includes(formattedDate) ? 'active-day' : '';
   };
 
@@ -94,10 +89,10 @@ function CalendarComponent() {
         showNavigation={false}
         minDate={minDate}
         maxDate={maxDate}
-        tileDisabled={tileDisabled}
         activeStartDate={viewDate}
         onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)}
         tileClassName={tileClassName}
+        showNeighboringMonth={false} // ★これが重要
       />
       <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
     </div>
