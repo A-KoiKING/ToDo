@@ -49,21 +49,13 @@ function CalendarComponent() {
     setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
-  const isHoliday = (date) => {
-    const holidays = [
-      '2025-01-01', '2025-02-11', '2025-04-29', '2025-05-03', '2025-05-04', '2025-05-05',
-      '2025-07-15', '2025-08-11', '2025-09-16', '2025-09-23', '2025-11-03', '2025-11-23'
-    ];
-    return holidays.includes(date.toISOString().split('T')[0]);
-  };
-
   const tileClassName = ({ date }) => {
     const formattedDate = date.toLocaleDateString('en-CA');
     if (activityDays.includes(formattedDate)) return 'active-day';
 
     const dayOfWeek = date.getDay(); // 0: 日, 1: 月, ..., 6: 土
     if (dayOfWeek === 6) return 'saturday'; // 土曜日
-    if (dayOfWeek === 0 || isHoliday(date)) return 'sunday-holiday'; // 日曜日・祝日
+    if (dayOfWeek === 0) return 'sunday'; // 日曜日
     return '';
   };
 
