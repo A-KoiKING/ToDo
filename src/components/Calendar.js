@@ -43,8 +43,8 @@ function CalendarComponent() {
 
   const handleNextMonth = () => {
     const currentDate = new Date();
-    const maxMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-
+    const maxMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
+  
     if (viewDate < maxMonth) {
       setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
     }
@@ -62,10 +62,6 @@ function CalendarComponent() {
   const tileClassName = ({ date }) => {
     const formattedDate = date.toLocaleDateString('en-CA');
     if (activityDays.includes(formattedDate)) return 'active-day';
-
-    const dayOfWeek = date.getDay();
-    if (dayOfWeek === 6) return 'saturday';
-    if (dayOfWeek === 0) return 'sunday';
     return '';
   };
 
