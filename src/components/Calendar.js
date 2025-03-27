@@ -66,7 +66,7 @@ function CalendarComponent() {
   };
 
   return (
-    <div>
+    <div className="calendar-container">
       <div className="custom-navigation">
         <button
           onClick={handlePrevMonth}
