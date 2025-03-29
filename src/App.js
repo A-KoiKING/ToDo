@@ -9,6 +9,7 @@ import Task from "./components/Task";
 import Confirm from "./components/Confirm";
 import Home from "./components/Home";
 import CalendarComponent from './components/Calendar';
+import Reservation from "./components/Reservation";
 
 function App() {
   const [userId, setUserId] = useState("");
@@ -43,7 +44,7 @@ function App() {
       setUserName(savedUserName);
       setIsLoggedIn(true);
 
-      const validRoutes = ["/home", "/task", "/calendar"];
+      const validRoutes = ["/home", "/task", "/calendar","/reservation"];
       const currentPath = location.pathname;
 
       if (!validRoutes.includes(currentPath)) {
@@ -150,9 +151,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.1.8"
-                    lastUpdated="2025-03-27"
-                    notice="Calendar Pageを更新しました!"
+                    version="0.2.0"
+                    lastUpdated="2025-03-30"
+                    notice="Reservation Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }
@@ -174,6 +175,12 @@ function App() {
                 path="/calendar"
                 element={
                   <CalendarComponent/>
+                }
+              />
+              <Route
+                path="reservation"
+                element={
+                  <Reservation/>
                 }
               />
             </Routes>

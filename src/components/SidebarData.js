@@ -2,6 +2,7 @@ import React from 'react'
 import HomeIcon from '@mui/icons-material/Home';
 import TaskIcon from '@mui/icons-material/Task';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 
 export const SidebarData = [
     {
@@ -18,5 +19,10 @@ export const SidebarData = [
         title: 'カレンダー',
         icon: <CalendarMonthIcon />,
         link: '#/calendar'
+    },
+    {
+        title: '予約',
+        icon: <PendingActionsIcon />,
+        link: '#/reservation'
     }
 ]
