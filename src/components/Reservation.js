@@ -15,6 +15,8 @@ import {
   TableRow,
   Paper,
   Button,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { firestore } from "../firebase";
@@ -23,9 +25,10 @@ import {
   getDocs,
   updateDoc,
   doc,
-  serverTimestamp,  
+  serverTimestamp,
   query,
   where,
+  onSnapshot,
 } from "firebase/firestore";
 import "./Reservation.css";
 import Selecte from "./Selecte";
@@ -52,32 +55,33 @@ const Reservation = () => {
   const [teamsData, setTeamsData] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    fetchTeams(tabIndex === 0);
-  }, [tabIndex]);
-
-  const fetchTeams = async (forHome = false) => {
     const teamsCollection = collection(firestore, "teams");
-    const teamSnapshot = await getDocs(teamsCollection);
-    const teams = [];
-
-    teamSnapshot.forEach((doc) => {
-      const data = doc.data();
-      teams.push({
-        id: doc.id,
-        name: data.name,
-        testrun: data.testrun,
-        measurement: data.measurement,
-        updatedAt: data.updatedAt ? data.updatedAt.toMillis() : 0,
+    const unsubscribe = onSnapshot(teamsCollection, (teamSnapshot) => {
+      const teams = [];
+  
+      teamSnapshot.forEach((doc) => {
+        const data = doc.data();
+        teams.push({
+          id: doc.id,
+          name: data.name,
+          testrun: data.testrun,
+          measurement: data.measurement,
+          updatedAt: data.updatedAt ? data.updatedAt.toMillis() : 0,
+        });
       });
+  
+      if (tabIndex !== 0) {
+        teams.sort((a, b) => a.updatedAt - b.updatedAt);
+      }
+  
+      setTeamsData(teams);
     });
-
-    if (!forHome) {
-      teams.sort((a, b) => a.updatedAt - b.updatedAt);
-    }
-    setTeamsData(teams);
-  };
+  
+    return () => unsubscribe();
+  }, [tabIndex]);
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -85,41 +89,56 @@ const Reservation = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setSelectedTeam(""); // ダイアログを閉じるときにリセット（任意）
+    setSelectedTeam("");
+  };
+
+  const handleConfirmEditMode = () => {
+    setIsEditable(true);
+    handleCloseDialog();
   };
 
   const updateTeamStatus = async () => {
     if (!selectedTeam) return;
 
-    // ここでは selectedTeam がチーム名（文字列）として扱われる
-    // Firestore でチーム名からドキュメントを特定する必要がある場合、クエリを追加
-    const teamsCollection = collection(firestore, "teams");
-    const teamQuery = query(teamsCollection, where("name", "==", selectedTeam));
-    const teamSnapshot = await getDocs(teamQuery);
-
-    if (!teamSnapshot.empty) {
-      const teamDoc = doc(firestore, "teams", teamSnapshot.docs[0].id);
-      const updateData = {
-        updatedAt: serverTimestamp(),
-      };
-
-      if (tabIndex === 1) {
-        updateData.testrun = 2; // テストラン: 順番待ち
-      } else if (tabIndex === 2) {
-        updateData.measurement = 2; // 計量計測: 順番待ち
-      } else if (tabIndex === 0) {
-        // ホームタブの場合の処理（例: testrun と measurement 両方を更新）
-        updateData.testrun = 2;
-        updateData.measurement = 2;
+    if (tabIndex === 0) {
+      const correctPassword = "correctpassword";
+      if (selectedTeam === correctPassword) {
+        setIsEditable(true);
       }
-
-      await updateDoc(teamDoc, updateData);
     } else {
-      console.log("指定されたチーム名が見つかりません");
+      const teamsCollection = collection(firestore, "teams");
+      const teamQuery = query(teamsCollection, where("name", "==", selectedTeam));
+      const teamSnapshot = await getDocs(teamQuery);
+
+      if (!teamSnapshot.empty) {
+        const teamDoc = doc(firestore, "teams", teamSnapshot.docs[0].id);
+        const updateData = {
+          updatedAt: serverTimestamp(),
+        };
+
+        if (tabIndex === 1) {
+          updateData.testrun = 2;
+        } else if (tabIndex === 2) {
+          updateData.measurement = 2;
+        }
+
+        await updateDoc(teamDoc, updateData);
+      } else {
+        console.log("指定されたチーム名が見つかりません");
+      }
     }
 
-    fetchTeams();
     handleCloseDialog();
+  };
+
+  const handleStatusChange = async (teamId, field, value) => {
+    const teamDoc = doc(firestore, "teams", teamId);
+    const updateData = {
+      updatedAt: serverTimestamp(),
+      [field]: Number(value),
+    };
+
+    await updateDoc(teamDoc, updateData);
   };
 
   return (
@@ -136,7 +155,7 @@ const Reservation = () => {
           <Tab className="reservation-tab" label="計量計測" />
         </Tabs>
 
-        {(tabIndex === 0) && (
+        {tabIndex === 0 && (
           <Box className="reservation-actions">
             <Button
               className="reservation-button"
@@ -162,12 +181,12 @@ const Reservation = () => {
 
         {tabIndex === 0 ? (
           <TextConfirm
-          open={openDialog}
-          selectedTeam={selectedTeam}
-          setSelectedTeam={setSelectedTeam}
-          onConfirm={updateTeamStatus}
-          onCancel={handleCloseDialog}
-        />
+            open={openDialog}
+            selectedTeam={selectedTeam}
+            setSelectedTeam={setSelectedTeam}
+            onConfirm={handleConfirmEditMode}
+            onCancel={handleCloseDialog}
+          />
         ) : (
           <Selecte
             open={openDialog}
@@ -197,14 +216,47 @@ const Reservation = () => {
                   <TableRow key={team.id} className="table-row">
                     <TableCell className="table-cell">{team.name}</TableCell>
                     <TableCell className="table-cell">
-                      {statusLabels.testrun[team.testrun]}
+                      {isEditable ? (
+                        <Select
+                          value={team.testrun}
+                          onChange={(e) =>
+                            handleStatusChange(team.id, "testrun", e.target.value)
+                          }
+                          fullWidth
+                        >
+                          {Object.entries(statusLabels.testrun).map(([key, label]) => (
+                            <MenuItem key={key} value={key}>
+                              {label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        statusLabels.testrun[team.testrun]
+                      )}
                     </TableCell>
                     <TableCell className="table-cell">
-                      {statusLabels.measurement[team.measurement]}
+                      {isEditable ? (
+                        <Select
+                          value={team.measurement}
+                          onChange={(e) =>
+                            handleStatusChange(team.id, "measurement", e.target.value)
+                          }
+                          fullWidth
+                        >
+                          {Object.entries(statusLabels.measurement).map(([key, label]) => (
+                            <MenuItem key={key} value={key}>
+                              {label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        statusLabels.measurement[team.measurement]
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
+
             </Table>
           </TableContainer>
         )}
