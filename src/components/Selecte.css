@@ -1,0 +1,30 @@
+.reservation-dialog {
+  padding: 20px;
+}
+
+.dialog-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.dialog-content {
+  margin-bottom: 20px;
+}
+
+.team-select {
+  width: 100%;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog-button {
+  margin-left: 10px;
+}
+
+.dialog-button.confirm {
+  background-color: #28a745;
+  color: white;
+}
