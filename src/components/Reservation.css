@@ -14,7 +14,7 @@
   background-color: #f9f9f9;
   border-radius: 10px;
   padding: 20px;
-  overflow-y: auto; /* コンテンツが多い場合のみスクロール */
+  overflow-y: auto;
 }
 
 .reservation-tabs {
@@ -76,8 +76,8 @@
 }
 
 .status-title {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 24px !important;
+  font-weight: bold !important;
 }
 
 .status-details {
