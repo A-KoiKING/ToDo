@@ -1,125 +1,126 @@
 .reservation-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 90%;
-    height: 100vh;
-    padding-top: 200px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  align-self: flex-start;
+  padding-top: 40px;
+}
 
-  .reservation-background {
-    width: 100%;
-    max-width: 1200px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 20px;
-  }
-  
-  .reservation-tabs {
-    margin-bottom: 20px;
-  }
-  
-  .reservation-tab {
-    font-size: 16px !important;
-    font-weight: bold !important;
-  }
-  
-  .reservation-actions {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .reservation-button {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .reservation-dialog {
-    padding: 20px;
-  }
-  
-  .dialog-title {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .dialog-content {
-    margin-bottom: 20px;
-  }
-  
-  .team-select {
-    width: 100%;
-  }
-  
-  .dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .dialog-button {
-    margin-left: 10px;
-  }
-  
-  .dialog-button.confirm {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .reservation-table-container {
-    margin-top: 20px;
-    overflow-x: auto;
-    width: 100%;
-  }
-  
-  .reservation-table {
-    width: 100%;
-    min-width: 500px;
-    table-layout: fixed;
-    border-collapse: collapse;
-    white-space: nowrap;
-  }
-  
-  .table-header {
-    font-weight: bold !important;
-    background-color: #007bff !important;
-    color: white !important;
-  }
-  
-  .table-row:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  .table-cell {
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .status-accordion {
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .status-summary {
-    background-color: #e3e3e3;
-  }
-  
-  .status-title {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .status-details {
-    background-color: #fff;
-    padding: 10px;
-  }
-  
-  .status-box {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .status-item {
-    padding: 5px 0;
-  }
+.reservation-background {
+  width: 100%;
+  max-width: 1200px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-y: auto; /* コンテンツが多い場合のみスクロール */
+}
+
+.reservation-tabs {
+  margin-bottom: 20px;
+}
+
+.reservation-tab {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.reservation-actions {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.reservation-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.reservation-dialog {
+  padding: 20px;
+}
+
+.dialog-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.dialog-content {
+  margin-bottom: 20px;
+}
+
+.team-select {
+  width: 100%;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog-button {
+  margin-left: 10px;
+}
+
+.dialog-button.confirm {
+  background-color: #28a745;
+  color: white;
+}
+
+.reservation-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.reservation-table {
+  width: 100%;
+  min-width: 500px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.table-header {
+  font-weight: bold !important;
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+.table-row:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.table-cell {
+  padding: 10px;
+  text-align: center;
+}
+
+.status-accordion {
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.status-summary {
+  background-color: #e3e3e3;
+}
+
+.status-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.status-details {
+  background-color: #fff;
+  padding: 10px;
+}
+
+.status-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-item {
+  padding: 5px 0;
+}

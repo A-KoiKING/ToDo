@@ -67,6 +67,7 @@ function CalendarComponent() {
 
   return (
     <div className="calendar-container">
+      <div className="calendar-background">
       <div className="custom-navigation">
         <button
           onClick={handlePrevMonth}
@@ -98,6 +99,7 @@ function CalendarComponent() {
         formatShortWeekday={(locale, date) => ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}
       />
       <p>選択された日付: {date.toLocaleDateString('ja-JP')}</p>
+      </div>
     </div>
   );
 }
