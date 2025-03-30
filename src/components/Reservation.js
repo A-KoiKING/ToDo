@@ -22,12 +22,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { firestore } from "../firebase";
 import {
   collection,
-  getDocs,
   updateDoc,
   doc,
   serverTimestamp,
-  query,
-  where,
   onSnapshot,
 } from "firebase/firestore";
 import "./Reservation.css";
@@ -76,14 +73,15 @@ const Reservation = () => {
       if (tabIndex !== 0) {
         teams.sort((a, b) => a.updatedAt - b.updatedAt);
       }
-  
+
       setTeamsData(teams);
     });
-  
+
     return () => unsubscribe();
   }, [tabIndex]);
 
   const handleOpenDialog = () => {
+    setSelectedTeam("");
     setOpenDialog(true);
   };
 
@@ -99,35 +97,19 @@ const Reservation = () => {
 
   const updateTeamStatus = async () => {
     if (!selectedTeam) return;
-
-    if (tabIndex === 0) {
-      const correctPassword = "correctpassword";
-      if (selectedTeam === correctPassword) {
-        setIsEditable(true);
-      }
-    } else {
-      const teamsCollection = collection(firestore, "teams");
-      const teamQuery = query(teamsCollection, where("name", "==", selectedTeam));
-      const teamSnapshot = await getDocs(teamQuery);
-
-      if (!teamSnapshot.empty) {
-        const teamDoc = doc(firestore, "teams", teamSnapshot.docs[0].id);
-        const updateData = {
-          updatedAt: serverTimestamp(),
-        };
-
-        if (tabIndex === 1) {
-          updateData.testrun = 2;
-        } else if (tabIndex === 2) {
-          updateData.measurement = 2;
-        }
-
-        await updateDoc(teamDoc, updateData);
-      } else {
-        console.log("指定されたチーム名が見つかりません");
-      }
+  
+    const teamDoc = doc(firestore, "teams", selectedTeam);
+    const updateData = {
+      updatedAt: serverTimestamp(),
+    };
+  
+    if (tabIndex === 1) {
+      updateData.testrun = 2; // テストラン: 順番待ち
+    } else if (tabIndex === 2) {
+      updateData.measurement = 2; // 計量計測: 順番待ち
     }
-
+  
+    await updateDoc(teamDoc, updateData);
     handleCloseDialog();
   };
 

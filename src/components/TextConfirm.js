@@ -10,27 +10,31 @@ import {
 import "./TextConfirm.css";
 
 const TextConfirm = ({
-  open,
-  selectedTeam,
-  setSelectedTeam,
-  onConfirm,
-  onCancel,
+    open, 
+    onConfirm, 
+    onCancel,
 }) => {
-    const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-    const correctPassword = "KoiKING39";
-  
-    const handleInputChange = (e) => {
-      const inputValue = e.target.value;
-      setSelectedTeam(inputValue);
-      setIsPasswordCorrect(inputValue === correctPassword);
-    };
+  const [passwordInput, setPasswordInput] = useState("");
+  const correctPassword = "KoiKING39";
+
+  const handleInputChange = (e) => {
+    setPasswordInput(e.target.value);
+  };
+
+  const handleConfirm = () => {
+    if (passwordInput === correctPassword) {
+      onConfirm();
+    }
+    setPasswordInput("");
+  };
+
   return (
     <Dialog className="text-confirm-dialog" open={open} onClose={onCancel}>
       <DialogTitle className="dialog-title">パスワードを入力してください</DialogTitle>
       <DialogContent className="dialog-content">
         <TextField
           className="text-field"
-          value={selectedTeam}
+          value={passwordInput}
           onChange={handleInputChange}
           label="password"
           variant="outlined"
@@ -44,9 +48,9 @@ const TextConfirm = ({
         </Button>
         <Button
           className="dialog-button confirm"
-          onClick={onConfirm}
+          onClick={handleConfirm}
           variant="contained"
-          disabled={!isPasswordCorrect}
+          disabled={passwordInput !== correctPassword}
         >
           決定
         </Button>
