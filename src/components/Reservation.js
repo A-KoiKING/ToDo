@@ -156,7 +156,7 @@ const Reservation = () => {
               variant="contained"
               onClick={handleOpenDialog}
             >
-              状態を変更
+              順番待ちにする
             </Button>
           </Box>
         )}

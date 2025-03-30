@@ -151,7 +151,7 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.2.3"
+                    version="0.2.4"
                     lastUpdated="2025-03-31"
                     notice="Reservation Pageを更新しました!"
                     targetDate="2025-09-28T13:00:00"
