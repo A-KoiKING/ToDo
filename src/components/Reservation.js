@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Tab, Box, Typography, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import { Tabs, Tab, Box, Typography, Accordion, AccordionSummary, AccordionDetails, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { firestore } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -22,31 +22,24 @@ const statusLabels = {
 
 const Reservation = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [testRunTeams, setTestRunTeams] = useState({});
-  const [measurementTeams, setMeasurementTeams] = useState({});
+  const [teamsData, setTeamsData] = useState([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
       const teamsCollection = collection(firestore, "teams");
       const teamSnapshot = await getDocs(teamsCollection);
-      const testRunData = {};
-      const measurementData = {};
+      const teams = [];
 
       teamSnapshot.forEach((doc) => {
         const data = doc.data();
-        const teamName = data.name;
-        const testRunStatus = Number(data.testrun);
-        const measurementStatus = Number(data.measurement);
-
-        if (!testRunData[testRunStatus]) testRunData[testRunStatus] = [];
-        if (!measurementData[measurementStatus]) measurementData[measurementStatus] = [];
-
-        testRunData[testRunStatus].push(teamName);
-        measurementData[measurementStatus].push(teamName);
+        teams.push({
+          name: data.name,
+          testrun: statusLabels.testrun[data.testrun] || "不明",
+          measurement: statusLabels.measurement[data.measurement] || "不明"
+        });
       });
-
-      setTestRunTeams(testRunData);
-      setMeasurementTeams(measurementData);
+      
+      setTeamsData(teams);
     };
 
     fetchTeams();
@@ -60,10 +53,10 @@ const Reservation = () => {
         </AccordionSummary>
         <AccordionDetails>
           <Box sx={{ paddingLeft: 2 }}>
-            {teams[key] ? (
-              teams[key].map((team) => (
-                <Typography key={team} sx={{ paddingLeft: 2 }}>
-                  {team}
+            {teams.filter(team => team[category] === label).length > 0 ? (
+              teams.filter(team => team[category] === label).map((team) => (
+                <Typography key={team.name} sx={{ paddingLeft: 2 }}>
+                  {team.name}
                 </Typography>
               ))
             ) : (
@@ -85,13 +78,34 @@ const Reservation = () => {
       </Tabs>
 
       {/* ホームタブ */}
-      {tabIndex === 0 && <Box></Box>}
+      {tabIndex === 0 && (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #ccc" }}>チーム名</TableCell>
+                <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #ccc" }}>テストラン</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>計量計測</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {teamsData.map((team) => (
+                <TableRow key={team.name}>
+                  <TableCell sx={{ fontWeight: "bold", borderRight: "1px solid #ccc" }}>{team.name}</TableCell>
+                  <TableCell sx={{ borderRight: "1px solid #ccc" }}>{team.testrun}</TableCell>
+                  <TableCell>{team.measurement}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* テストランタブ */}
-      {tabIndex === 1 && <Box>{renderTeams(testRunTeams, "testrun")}</Box>}
+      {tabIndex === 1 && <Box>{renderTeams(teamsData, "testrun")}</Box>}
 
       {/* 計量計測タブ */}
-      {tabIndex === 2 && <Box>{renderTeams(measurementTeams, "measurement")}</Box>}
+      {tabIndex === 2 && <Box>{renderTeams(teamsData, "measurement")}</Box>}
     </Box>
   );
 };
