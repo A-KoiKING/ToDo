@@ -28,10 +28,10 @@ const Reservation = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
-    fetchTeams();
-  }, []);
+    fetchTeams(tabIndex === 0);
+  }, [tabIndex]);
 
-  const fetchTeams = async () => {
+  const fetchTeams = async (forHome = false) => {
     const teamsCollection = collection(firestore, "teams");
     const teamSnapshot = await getDocs(teamsCollection);
     const teams = [];
@@ -47,7 +47,9 @@ const Reservation = () => {
       });
     });
     
-    teams.sort((a, b) => a.updatedAt - b.updatedAt);
+    if (!forHome) {
+      teams.sort((a, b) => a.updatedAt - b.updatedAt);
+    }
     setTeamsData(teams);
   };
 
