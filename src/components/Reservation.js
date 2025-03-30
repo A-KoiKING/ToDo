@@ -23,10 +23,13 @@ import {
   getDocs,
   updateDoc,
   doc,
-  serverTimestamp,
+  serverTimestamp,  
+  query,
+  where,
 } from "firebase/firestore";
 import "./Reservation.css";
-import Selecte from "./Selecte"; // `Selecte` をインポート
+import Selecte from "./Selecte";
+import TextConfirm from "./TextConfirm";
 
 const statusLabels = {
   testrun: {
@@ -82,23 +85,38 @@ const Reservation = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+    setSelectedTeam(""); // ダイアログを閉じるときにリセット（任意）
   };
 
   const updateTeamStatus = async () => {
     if (!selectedTeam) return;
 
-    const teamDoc = doc(firestore, "teams", selectedTeam);
-    const updateData = {
-      updatedAt: serverTimestamp(),
-    };
+    // ここでは selectedTeam がチーム名（文字列）として扱われる
+    // Firestore でチーム名からドキュメントを特定する必要がある場合、クエリを追加
+    const teamsCollection = collection(firestore, "teams");
+    const teamQuery = query(teamsCollection, where("name", "==", selectedTeam));
+    const teamSnapshot = await getDocs(teamQuery);
 
-    if (tabIndex === 1) {
-      updateData.testrun = 2;
-    } else if (tabIndex === 2) {
-      updateData.measurement = 2;
+    if (!teamSnapshot.empty) {
+      const teamDoc = doc(firestore, "teams", teamSnapshot.docs[0].id);
+      const updateData = {
+        updatedAt: serverTimestamp(),
+      };
+
+      if (tabIndex === 1) {
+        updateData.testrun = 2; // テストラン: 順番待ち
+      } else if (tabIndex === 2) {
+        updateData.measurement = 2; // 計量計測: 順番待ち
+      } else if (tabIndex === 0) {
+        // ホームタブの場合の処理（例: testrun と measurement 両方を更新）
+        updateData.testrun = 2;
+        updateData.measurement = 2;
+      }
+
+      await updateDoc(teamDoc, updateData);
+    } else {
+      console.log("指定されたチーム名が見つかりません");
     }
-
-    await updateDoc(teamDoc, updateData);
 
     fetchTeams();
     handleCloseDialog();
@@ -118,6 +136,18 @@ const Reservation = () => {
           <Tab className="reservation-tab" label="計量計測" />
         </Tabs>
 
+        {(tabIndex === 0) && (
+          <Box className="reservation-actions">
+            <Button
+              className="reservation-button"
+              variant="contained"
+              onClick={handleOpenDialog}
+            >
+              編集画面
+            </Button>
+          </Box>
+        )}
+
         {(tabIndex === 1 || tabIndex === 2) && (
           <Box className="reservation-actions">
             <Button
@@ -130,14 +160,24 @@ const Reservation = () => {
           </Box>
         )}
 
-        <Selecte
+        {tabIndex === 0 ? (
+          <TextConfirm
           open={openDialog}
           selectedTeam={selectedTeam}
           setSelectedTeam={setSelectedTeam}
-          teamsData={teamsData}
           onConfirm={updateTeamStatus}
           onCancel={handleCloseDialog}
         />
+        ) : (
+          <Selecte
+            open={openDialog}
+            selectedTeam={selectedTeam}
+            setSelectedTeam={setSelectedTeam}
+            teamsData={teamsData}
+            onConfirm={updateTeamStatus}
+            onCancel={handleCloseDialog}
+          />
+        )}
 
         {tabIndex === 0 && (
           <TableContainer
