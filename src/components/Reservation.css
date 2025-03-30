@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    width: 100%;
+    width: 90%;
     height: 100vh;
     padding-top: 200px;
   }
@@ -68,11 +68,16 @@
   
   .reservation-table-container {
     margin-top: 20px;
+    overflow-x: auto;
+    width: 100%;
   }
   
   .reservation-table {
     width: 100%;
+    min-width: 500px;
+    table-layout: fixed;
     border-collapse: collapse;
+    white-space: nowrap;
   }
   
   .table-header {
