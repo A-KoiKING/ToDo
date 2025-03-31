@@ -66,7 +66,8 @@ const Reservation = () => {
           name: data.name,
           testrun: data.testrun,
           measurement: data.measurement,
-          updatedAt: data.updatedAt ? data.updatedAt.toMillis() : 0,
+          updatedAtTestrun: data.updatedAtTestrun ? data.updatedAtTestrun.toMillis() : 0,
+          updatedAtMeasurement: data.updatedAtMeasurement ? data.updatedAtMeasurement.toMillis() : 0,
         });
       });
 
@@ -95,14 +96,14 @@ const Reservation = () => {
     if (!selectedTeam) return;
 
     const teamDoc = doc(firestore, "teams", selectedTeam);
-    const updateData = {
-      updatedAt: serverTimestamp(),
-    };
+    const updateData = {};
 
     if (tabIndex === 1) {
       updateData.testrun = 2;
+      updateData.updatedAtTestrun = serverTimestamp();
     } else if (tabIndex === 2) {
       updateData.measurement = 2;
+      updateData.updatedAtMeasurement = serverTimestamp();
     }
 
     await updateDoc(teamDoc, updateData);
@@ -112,12 +113,19 @@ const Reservation = () => {
   const handleStatusChange = async (teamId, field, value) => {
     const teamDoc = doc(firestore, "teams", teamId);
     const updateData = {
-      updatedAt: serverTimestamp(),
       [field]: Number(value),
     };
-
+  
+    // 編集時にも更新日時を保存する
+    if (field === "testrun") {
+      updateData.updatedAtTestrun = serverTimestamp();
+    } else if (field === "measurement") {
+      updateData.updatedAtMeasurement = serverTimestamp();
+    }
+  
     await updateDoc(teamDoc, updateData);
   };
+  
 
   return (
     <div className="reservation-container">
@@ -245,7 +253,9 @@ const Reservation = () => {
             );
 
             if (Number(key) === 2) {
-              filteredTeams.sort((a, b) => a.updatedAt - b.updatedAt);
+              filteredTeams.sort((a, b) =>
+                (tabIndex === 1 ? a.updatedAtTestrun - b.updatedAtTestrun : a.updatedAtMeasurement - b.updatedAtMeasurement)
+              );
             }
 
             return (
@@ -273,9 +283,9 @@ const Reservation = () => {
                             </Typography>
                             <Typography className="status-time">
                               最終更新:{" "}
-                              {team.updatedAt
-                                ? new Date(team.updatedAt).toLocaleString("ja-JP")
-                                : "不明"}
+                              {tabIndex === 1
+                                ? (team.updatedAtTestrun ? new Date(team.updatedAtTestrun).toLocaleString("ja-JP") : "不明")
+                                : (team.updatedAtMeasurement ? new Date(team.updatedAtMeasurement).toLocaleString("ja-JP") : "不明")}
                             </Typography>
                           </div>
                         </div>
