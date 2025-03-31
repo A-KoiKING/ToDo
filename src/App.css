@@ -24,6 +24,10 @@ body {
   box-sizing: border-box;
 }
 
+.no-padding {
+  padding: 0 !important;
+}
+
 .menu-toggle {
   display: none;
   position: fixed;

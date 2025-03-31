@@ -145,7 +145,7 @@ function App() {
             isOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
           />
-          <div className="main-content">
+          <div className={`main-content ${location.pathname === "/home" ? "no-padding" : ""}`}>
             <Routes>
               <Route
                 path="/home"
