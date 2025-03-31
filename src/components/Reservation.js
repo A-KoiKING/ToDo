@@ -100,9 +100,9 @@ const Reservation = () => {
     };
 
     if (tabIndex === 1) {
-      updateData.testrun = 2; // テストラン: 順番待ち
+      updateData.testrun = 2;
     } else if (tabIndex === 2) {
-      updateData.measurement = 2; // 計量計測: 順番待ち
+      updateData.measurement = 2;
     }
 
     await updateDoc(teamDoc, updateData);
@@ -234,7 +234,6 @@ const Reservation = () => {
                   </TableRow>
                 ))}
               </TableBody>
-
             </Table>
           </TableContainer>
         )}
@@ -248,7 +247,6 @@ const Reservation = () => {
             if (Number(key) === 2) {
               filteredTeams.sort((a, b) => a.updatedAt - b.updatedAt);
             }
-
 
             return (
               <Accordion
@@ -281,7 +279,9 @@ const Reservation = () => {
                         </div>
                       ))
                     ) : (
-                      <Typography className="status-item no-border">該当なし</Typography>
+                      <Typography className="status-item no-border">
+                        該当なし
+                      </Typography>
                     )}
                   </Box>
                 </AccordionDetails>
