@@ -268,7 +268,9 @@ const Reservation = () => {
                       filteredTeams.map((team) => (
                         <div key={team.id} className="status-item">
                           <div className="status-content">
-                            <Typography>{team.name}</Typography>
+                            <Typography className="status-name">
+                              {team.name}
+                            </Typography>
                             <Typography className="status-time">
                               最終更新:{" "}
                               {team.updatedAt
