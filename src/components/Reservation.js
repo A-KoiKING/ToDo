@@ -70,15 +70,11 @@ const Reservation = () => {
         });
       });
 
-      if (tabIndex !== 0) {
-        teams.sort((a, b) => a.updatedAt - b.updatedAt);
-      }
-
       setTeamsData(teams);
     });
 
     return () => unsubscribe();
-  }, [tabIndex]);
+  }, []);
 
   const handleOpenDialog = () => {
     setSelectedTeam("");
@@ -242,48 +238,36 @@ const Reservation = () => {
             </Table>
           </TableContainer>
         )}
+        {(tabIndex === 1 || tabIndex === 2) &&
+          Object.entries(statusLabels[tabIndex === 1 ? "testrun" : "measurement"]).map(([key, label]) => {
+            let filteredTeams = teamsData.filter(
+              (team) =>
+                Number(team[tabIndex === 1 ? "testrun" : "measurement"]) === Number(key)
+            );
 
-        {(tabIndex === 1 || tabIndex === 2) && (
-          Object.entries(
-            statusLabels[tabIndex === 1 ? "testrun" : "measurement"]
-          ).map(([key, label]) => (
-            <Accordion
-              className="status-accordion"
-              defaultExpanded
-              key={key}
-            >
-              <AccordionSummary
-                className="status-summary"
-                expandIcon={<ExpandMoreIcon />}
+            if (Number(key) === 2) {
+              filteredTeams.sort((a, b) => a.updatedAt - b.updatedAt);
+            }
+
+
+            return (
+              <Accordion
+                className="status-accordion"
+                defaultExpanded
+                key={key}
               >
-                <Typography className="status-title">{label}</Typography>
-              </AccordionSummary>
-              <AccordionDetails className="status-details">
-                <Box className="status-box">
-                  {teamsData
-                    .filter(
-                      (team) =>
-                        Number(team[tabIndex === 1 ? "testrun" : "measurement"]) === Number(key)
-                    )
-                    .map((team) => (
-                      <div key={team.id} className="status-item">
-                        <div className="status-content">
-                          <Typography>{team.name}</Typography>
-                          <Typography className="status-time">
-                            最終更新:{" "}
-                            {team.updatedAt
-                              ? new Date(team.updatedAt).toLocaleString("ja-JP")
-                              : "不明"}
-                          </Typography>
-                        </div>
-                      </div>
-                    )).length > 0 ? (
-                    teamsData
-                      .filter(
-                        (team) =>
-                          Number(team[tabIndex === 1 ? "testrun" : "measurement"]) === Number(key)
-                      )
-                      .map((team) => (
+                <AccordionSummary
+                  className="status-summary"
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography className="status-title">
+                    {label}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails className="status-details">
+                  <Box className="status-box">
+                    {filteredTeams.length > 0 ? (
+                      filteredTeams.map((team) => (
                         <div key={team.id} className="status-item">
                           <div className="status-content">
                             <Typography>{team.name}</Typography>
@@ -296,14 +280,14 @@ const Reservation = () => {
                           </div>
                         </div>
                       ))
-                  ) : (
-                    <Typography className="status-item no-border">該当なし</Typography>
-                  )}
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))
-        )}
+                    ) : (
+                      <Typography className="status-item no-border">該当なし</Typography>
+                    )}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
       </div>
     </div>
   );
