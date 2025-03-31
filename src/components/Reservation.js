@@ -58,7 +58,7 @@ const Reservation = () => {
     const teamsCollection = collection(firestore, "teams");
     const unsubscribe = onSnapshot(teamsCollection, (teamSnapshot) => {
       const teams = [];
-  
+
       teamSnapshot.forEach((doc) => {
         const data = doc.data();
         teams.push({
@@ -69,7 +69,7 @@ const Reservation = () => {
           updatedAt: data.updatedAt ? data.updatedAt.toMillis() : 0,
         });
       });
-  
+
       if (tabIndex !== 0) {
         teams.sort((a, b) => a.updatedAt - b.updatedAt);
       }
@@ -97,18 +97,18 @@ const Reservation = () => {
 
   const updateTeamStatus = async () => {
     if (!selectedTeam) return;
-  
+
     const teamDoc = doc(firestore, "teams", selectedTeam);
     const updateData = {
       updatedAt: serverTimestamp(),
     };
-  
+
     if (tabIndex === 1) {
       updateData.testrun = 2; // テストラン: 順番待ち
     } else if (tabIndex === 2) {
       updateData.measurement = 2; // 計量計測: 順番待ち
     }
-  
+
     await updateDoc(teamDoc, updateData);
     handleCloseDialog();
   };
@@ -260,25 +260,44 @@ const Reservation = () => {
               </AccordionSummary>
               <AccordionDetails className="status-details">
                 <Box className="status-box">
-                  {teamsData.filter(
-                    (team) =>
-                      Number(team[tabIndex === 1 ? "testrun" : "measurement"]) ===
-                      Number(key)
-                  ).length > 0 ? (
+                  {teamsData
+                    .filter(
+                      (team) =>
+                        Number(team[tabIndex === 1 ? "testrun" : "measurement"]) === Number(key)
+                    )
+                    .map((team) => (
+                      <div key={team.id} className="status-item">
+                        <div className="status-content">
+                          <Typography>{team.name}</Typography>
+                          <Typography className="status-time">
+                            最終更新:{" "}
+                            {team.updatedAt
+                              ? new Date(team.updatedAt).toLocaleString("ja-JP")
+                              : "不明"}
+                          </Typography>
+                        </div>
+                      </div>
+                    )).length > 0 ? (
                     teamsData
                       .filter(
                         (team) =>
-                          Number(
-                            team[tabIndex === 1 ? "testrun" : "measurement"]
-                          ) === Number(key)
+                          Number(team[tabIndex === 1 ? "testrun" : "measurement"]) === Number(key)
                       )
                       .map((team) => (
-                        <Typography key={team.id} className="status-item">
-                          {team.name}
-                        </Typography>
+                        <div key={team.id} className="status-item">
+                          <div className="status-content">
+                            <Typography>{team.name}</Typography>
+                            <Typography className="status-time">
+                              最終更新:{" "}
+                              {team.updatedAt
+                                ? new Date(team.updatedAt).toLocaleString("ja-JP")
+                                : "不明"}
+                            </Typography>
+                          </div>
+                        </div>
                       ))
                   ) : (
-                    <Typography className="status-item">該当なし</Typography>
+                    <Typography className="status-item no-border">該当なし</Typography>
                   )}
                 </Box>
               </AccordionDetails>
