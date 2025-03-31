@@ -71,17 +71,19 @@ function Home({ lastUpdated, version, notice, targetDate }) {
 
   return (
     <div className="home">
-      <h1>
+      <h1 className="home-h1">
         <span className="title-part">函館高専</span>
         <span className="title-part">ロボット研究会</span>
       </h1>
-      <h2>地区大会まで</h2>
+      <h2 className="home-h2">
+        地区大会まで
+      </h2>
       {targetDate && (
         <p className={`timer ${isExpired ? 'expired' : ''}`}>
-        {isExpired ? (
-          '期限が過ぎています'
-        ) : (
-          <>
+          {isExpired ? (
+            '期限が過ぎています'
+          ) : (
+            <>
               <span className="time-group">
                 <span className="time-part">{formatTime(days)}日 </span>
                 <span className="time-part">{formatTime(hours)}時間</span>
@@ -90,9 +92,9 @@ function Home({ lastUpdated, version, notice, targetDate }) {
                 <span className="time-part">{formatTime(minutes)}分 </span>
                 <span className="time-part">{formatTime(seconds)}秒</span>
               </span>
-          </>
-        )}
-      </p>
+            </>
+          )}
+        </p>
       )}
       <p><strong>お知らせ:</strong> {notice || 'お知らせはありません'}</p>
       <p><strong>バージョン:</strong> {version || '未設定'}</p>
