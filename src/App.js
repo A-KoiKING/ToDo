@@ -174,7 +174,7 @@ function App() {
               <Route
                 path="/calendar"
                 element={
-                  <CalendarComponent/>
+                  <CalendarComponent initialUserName={userName}/>
                 }
               />
               <Route
