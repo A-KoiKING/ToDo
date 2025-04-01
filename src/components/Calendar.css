@@ -28,11 +28,11 @@
 }
 
 .react-calendar__tile {
-  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   background: none;
-  border: none;
   padding: 12px;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .react-calendar__tile:hover {
@@ -40,8 +40,9 @@
 }
 
 .react-calendar__tile--now {
-  background: #FFC1CC !important;
+  background: #5770c4 !important;
   font-weight: bold !important;
+  color: rgb(255, 255, 255) !important;
 }
 
 .react-calendar__tile--active {
