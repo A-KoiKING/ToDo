@@ -1,7 +1,7 @@
 import React from 'react';
 import './Confirm.css';
 
-const Confirm = ({ message = 'ログアウトしますか？', onConfirm, onCancel }) => {
+const Confirm = ({ message, onConfirm, onCancel }) => {
   return (
     <div className="confirm-overlay">
       <div className="confirm-box">
