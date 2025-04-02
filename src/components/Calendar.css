@@ -172,12 +172,15 @@
   cursor: pointer;
 }
 
-.absence-form button[type="submit"] {
+.absence-form button {
   background-color: #2d445b;
   color: white;
 }
 
-.absence-form button[type="button"] {
-  background-color: #ccc;
-  color: black;
+button:disabled {
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+  border: 1px solid #b0b0b0;
+  opacity: 0.5;
 }

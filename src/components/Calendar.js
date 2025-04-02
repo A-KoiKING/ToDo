@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./Calendar.css";
 import { firestore } from "../firebase";
-import { collection, getDocs, doc, setDoc, arrayUnion } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import Confirm from "./Confirm";
 
 function CalendarComponent({ initialUserName }) {
@@ -12,37 +12,36 @@ function CalendarComponent({ initialUserName }) {
   const [userName] = useState(initialUserName);
   const [confirmMessage, setConfirmMessage] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [absentees, setAbsentees] = useState([]);
 
   useEffect(() => {
-    let mounted = true;
+    const unsubscribe = onSnapshot(collection(firestore, "activities"), (snapshot) => {
+      const days = snapshot.docs
+        .filter(doc => doc.data().active === true)
+        .map(doc => doc.id)
+        .filter(id => /^\d{4}-\d{2}-\d{2}$/.test(id));
 
-    const fetchActivityDays = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(firestore, "activities"));
-        const days = querySnapshot.docs
-          .map((doc) => {
-            const id = doc.id;
-            return /^\d{4}-\d{2}-\d{2}$/.test(id) ? id : null;
-          })
-          .filter((day) => day !== null);
+      setActivityDays(days);
+    });
 
-        if (mounted) {
-          setActivityDays(days);
-        }
-      } catch (error) {
-        console.error("活動日の取得エラー:", error);
-      }
-    };
-
-    fetchActivityDays();
-
-    return () => {
-      mounted = false;
-    };
+    return () => unsubscribe();
   }, []);
+
+  const fetchAbsentees = async (selectedDate) => {
+    const formattedDate = selectedDate.toLocaleDateString("en-CA");
+    const docRef = doc(firestore, "activities", formattedDate);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setAbsentees(docSnap.data().users || []);
+    } else {
+      setAbsentees([]);
+    }
+  };
 
   const onChange = (newDate) => {
     setDate(newDate);
+    fetchAbsentees(newDate);
   };
 
   const handleNextMonth = () => {
@@ -76,6 +75,7 @@ function CalendarComponent({ initialUserName }) {
 
     try {
       await setDoc(docRef, { users: arrayUnion(userName) }, { merge: true });
+      fetchAbsentees(date);
     } catch (error) {
       console.error("エラー:", error);
       setConfirmMessage("登録に失敗しました");
@@ -88,6 +88,8 @@ function CalendarComponent({ initialUserName }) {
     const formattedDate = date.toLocaleDateString("en-CA");
     return activityDays.includes(formattedDate) ? "active-day" : "";
   };
+
+  const isActivityDay = activityDays.includes(date.toLocaleDateString("en-CA"));
 
   return (
     <div className="calendar-container">
@@ -122,6 +124,19 @@ function CalendarComponent({ initialUserName }) {
           showNeighboringMonth={false}
           formatShortWeekday={(locale, date) => ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]}
         />
+        {/* 欠席者一覧 */}
+        <div className="absentees-list">
+          <h3>{date.toLocaleDateString("ja-JP")} の欠席者</h3>
+          {absentees.length > 0 ? (
+            <ul>
+              {absentees.map((absentee, index) => (
+                <li key={index}>{absentee}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>欠席者はいません</p>
+          )}
+        </div>
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -132,7 +147,9 @@ function CalendarComponent({ initialUserName }) {
         >
           <h3>{date.toLocaleDateString("ja-JP")} の欠席登録</h3>
           <p>ユーザー名: <strong>{userName}</strong></p>
-          <button type="submit">提出</button>
+          <button type="submit" disabled={absentees.includes(userName) || !isActivityDay}>
+            提出
+          </button>
         </form>
         {/* 確認ダイアログ */}
         {showConfirm && (
