@@ -24,6 +24,8 @@ function CalendarComponent({ initialUserName }) {
       setActivityDays(days);
     });
 
+    fetchAbsentees(new Date());
+
     return () => unsubscribe();
   }, []);
 
@@ -124,46 +126,50 @@ function CalendarComponent({ initialUserName }) {
           showNeighboringMonth={false}
           formatShortWeekday={(locale, date) => ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]}
         />
-        {/* 欠席者一覧 */}
-        <div className="absentees-list">
-          <h3>{date.toLocaleDateString("ja-JP")} の欠席者</h3>
-          {absentees.length > 0 ? (
-            <ul>
-              {absentees.map((absentee, index) => (
-                <li key={index}>{absentee}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>欠席者はいません</p>
+        {/* 欠席者一覧 & 欠席登録フォーム */}
+        <div className="absence-container">
+          {/* 欠席者一覧 */}
+          <div className="absentees-list">
+            <h3>{date.toLocaleDateString("ja-JP")} の欠席者</h3>
+            {absentees.length > 0 ? (
+              <ul>
+                {absentees.map((absentee, index) => (
+                  <li key={index}>{absentee}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>欠席者はいません</p>
+            )}
+          </div>
+          {/* 欠席登録フォーム */}
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を登録しますか？`);
+              setShowConfirm(true);
+            }}
+            className="absence-form"
+          >
+            <h3>{date.toLocaleDateString("ja-JP")} の欠席登録</h3>
+            <p>ユーザー名: <strong>{userName}</strong></p>
+            <button type="submit" disabled={absentees.includes(userName) || !isActivityDay}>
+              提出
+            </button>
+          </form>
+          {/* 確認ダイアログ */}
+          {showConfirm && (
+            <Confirm
+              message={confirmMessage}
+              onConfirm={() => {
+                setShowConfirm(false);
+                if (confirmMessage.includes("登録しますか？")) {
+                  handleSubmit();
+                }
+              }}
+              onCancel={() => setShowConfirm(false)}
+            />
           )}
         </div>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を登録しますか？`);
-            setShowConfirm(true);
-          }}
-          className="absence-form"
-        >
-          <h3>{date.toLocaleDateString("ja-JP")} の欠席登録</h3>
-          <p>ユーザー名: <strong>{userName}</strong></p>
-          <button type="submit" disabled={absentees.includes(userName) || !isActivityDay}>
-            提出
-          </button>
-        </form>
-        {/* 確認ダイアログ */}
-        {showConfirm && (
-          <Confirm
-            message={confirmMessage}
-            onConfirm={() => {
-              setShowConfirm(false);
-              if (confirmMessage.includes("登録しますか？")) {
-                handleSubmit();
-              }
-            }}
-            onCancel={() => setShowConfirm(false)}
-          />
-        )}
       </div>
     </div>
   );
