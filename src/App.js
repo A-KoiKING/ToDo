@@ -155,8 +155,8 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.3.0"
-                    lastUpdated="2025-04-02"
+                    version="0.3.1"
+                    lastUpdated="2025-04-03"
                     notice="Calendar Pageの欠席機能を実装"
                     targetDate="2025-09-28T13:00:00"
                   />
