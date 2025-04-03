@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-//import './Task.css';
+import React, { useState } from "react";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+import "./Task.css"
 
 function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
-  const [taskName, setTaskName] = useState('');
-  const [priority, setPriority] = useState('通常');
+  const [taskName, setTaskName] = useState("");
+  const [priority, setPriority] = useState("通常");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openAccordions, setOpenAccordions] = useState({
     通常: true,
@@ -13,11 +20,11 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (taskName.trim() === '' || isSubmitting) return;
+    if (taskName.trim() === "" || isSubmitting) return;
     setIsSubmitting(true);
     await handleAddTask({ name: taskName, priority, user: userName });
-    setTaskName('');
-    setPriority('通常');
+    setTaskName("");
+    setPriority("通常");
     setIsSubmitting(false);
   };
 
@@ -29,15 +36,15 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
   };
 
   const groupedTasks = {
-    通常: tasks.filter((task) => task.priority === '通常'),
-    重要: tasks.filter((task) => task.priority === '重要'),
-    緊急: tasks.filter((task) => task.priority === '緊急'),
+    通常: tasks.filter((task) => task.priority === "通常"),
+    重要: tasks.filter((task) => task.priority === "重要"),
+    緊急: tasks.filter((task) => task.priority === "緊急"),
   };
 
   return (
     <div className="task">
       <h1>タスク管理</h1>
-      <form onSubmit={onSubmit} className="form">
+      <form onSubmit={onSubmit} className="task-form">
         <input
           type="text"
           value={taskName}
@@ -45,54 +52,67 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
           placeholder="タスクを入力してください"
           required
           autoComplete="off"
-          className="input"
+          className="task-input"
         />
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="select"
+          className="task-select"
         >
           <option value="通常">通常</option>
           <option value="重要">重要</option>
           <option value="緊急">緊急</option>
         </select>
-        <button type="submit" disabled={isSubmitting} className="button">
-          {isSubmitting ? '追加中...' : '追加'}
+        <button type="submit" disabled={isSubmitting} className="task-button">
+          {isSubmitting ? "追加中..." : "追加"}
         </button>
       </form>
 
       <div className="accordion-container">
-        {['緊急', '重要', '通常'].map((level) => (
-          <div key={level} className="accordion">
-            <h2
-              className={`accordion-title priority-${level}`}
-              onClick={() => toggleAccordion(level)}
+        {["緊急", "重要", "通常"].map((level) => (
+          <Accordion 
+            className="content-accordion" 
+            key={level}
+            expanded={openAccordions[level]}
+            onChange={() => toggleAccordion(level)}
+          >
+            <AccordionSummary
+              className="content-summary"
+              expandIcon={<ExpandMoreIcon />}
             >
-              {level} {openAccordions[level] ? '▼' : '▶'}
-            </h2>
-            {openAccordions[level] && (
-              <ul className="accordion-content">
+              <Typography className="content-title">{level}</Typography>
+            </AccordionSummary>
+            <AccordionDetails className="content-details">
+              <Box className="content-box">
                 {groupedTasks[level].length > 0 ? (
                   groupedTasks[level].map((task) => (
-                    <li key={task.id}>
-                      {task.user} : {task.name}{' '}
-                      {task.createdAt
-                        ? new Date(task.createdAt.seconds * 1000).toLocaleString()
-                        : '日時不明'}
+                    <div key={task.id} className="content-item">
+                      <div className="content-content">
+                        <Typography className="content-name">
+                          {task.user} : {task.name}
+                        </Typography>
+                        <Typography className="content-time">
+                          {task.createdAt
+                            ? new Date(task.createdAt.seconds * 1000).toLocaleString()
+                            : "日時不明"}
+                        </Typography>
+                      </div>
                       <button
                         onClick={() => handleDeleteTask(task.id)}
-                        className="delete-button"
+                        className="task-button"
                       >
                         削除
                       </button>
-                    </li>
+                    </div>
                   ))
                 ) : (
-                  <li className="no-tasks">タスクがありません</li>
+                  <Typography className="content-item no-border">
+                    タスクがありません
+                  </Typography>
                 )}
-              </ul>
-            )}
-          </div>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         ))}
       </div>
     </div>
