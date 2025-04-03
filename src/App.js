@@ -55,8 +55,10 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e, setErrorMessage) => {
     e.preventDefault();
+    setErrorMessage("");
+
     const userRef = collection(firestore, "users");
     const userQuery = query(userRef, where("userId", "==", userId), where("password", "==", password));
     const userSnapshot = await getDocs(userQuery);
@@ -67,8 +69,10 @@ function App() {
       localStorage.setItem("userName", userSnapshot.docs[0].data().userName);
       setIsLoggedIn(true);
       navigate("/home");
+      return true;
     } else {
-      console.log("ユーザーIDまたはパスワードが間違っています");
+      setErrorMessage("ユーザーIDまたはパスワードが間違っています");
+      return false;
     }
   };
 
