@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./Calendar.css";
 import { firestore } from "../firebase";
-import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { collection, doc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 import Confirm from "./Confirm";
 
 function CalendarComponent({ initialUserName }) {
@@ -20,30 +20,29 @@ function CalendarComponent({ initialUserName }) {
         .filter(doc => doc.data().active === true)
         .map(doc => doc.id)
         .filter(id => /^\d{4}-\d{2}-\d{2}$/.test(id));
-
       setActivityDays(days);
     });
-
-    fetchAbsentees(new Date());
 
     return () => unsubscribe();
   }, []);
 
-  const fetchAbsentees = async (selectedDate) => {
-    const formattedDate = selectedDate.toLocaleDateString("en-CA");
+  useEffect(() => {
+    const formattedDate = date.toLocaleDateString("en-CA");
     const docRef = doc(firestore, "activities", formattedDate);
-    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      setAbsentees(docSnap.data().users || []);
-    } else {
-      setAbsentees([]);
-    }
-  };
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setAbsentees(docSnap.data().users || []);
+      } else {
+        setAbsentees([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [date]);
 
   const onChange = (newDate) => {
     setDate(newDate);
-    fetchAbsentees(newDate);
   };
 
   const handleNextMonth = () => {
@@ -64,7 +63,6 @@ function CalendarComponent({ initialUserName }) {
     }
   };
 
-
   const handleSubmit = async () => {
     if (!userName.trim()) {
       setConfirmMessage("ログイン情報がありません");
@@ -77,7 +75,6 @@ function CalendarComponent({ initialUserName }) {
 
     try {
       await setDoc(docRef, { users: arrayUnion(userName) }, { merge: true });
-      fetchAbsentees(date);
     } catch (error) {
       console.error("エラー:", error);
       setConfirmMessage("登録に失敗しました");
@@ -91,7 +88,6 @@ function CalendarComponent({ initialUserName }) {
 
     try {
       await updateDoc(docRef, { users: arrayRemove(userName) });
-      fetchAbsentees(date);
     } catch (error) {
       console.error("削除エラー:", error);
       setConfirmMessage("削除に失敗しました");
