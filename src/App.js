@@ -16,9 +16,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const navigate = useNavigate();
@@ -44,7 +42,7 @@ function App() {
       setUserName(savedUserName);
       setIsLoggedIn(true);
 
-      const validRoutes = ["/home", "/task", "/calendar","/reservation"];
+      const validRoutes = ["/home", "/task", "/calendar", "/reservation"];
       const currentPath = location.pathname;
 
       if (!validRoutes.includes(currentPath)) {
@@ -80,7 +78,7 @@ function App() {
     setUserId("");
     setPassword("");
     setUserName("");
-    setTask("");
+    setTasks([]);
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
@@ -93,22 +91,16 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleAddTask = async (e) => {
-    e.preventDefault();
-    if (task.trim() === "" || isSubmitting) return;
-    setIsSubmitting(true);
-
+  const handleAddTask = async (taskData) => {
     try {
       await addDoc(collection(firestore, "tasks"), {
-        name: task,
-        user: userName,
+        name: taskData.name,
+        user: taskData.user,
+        priority: taskData.priority,
         createdAt: new Date(),
       });
-      setTask("");
     } catch (error) {
       console.log("タスク追加エラー:" + error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -167,11 +159,9 @@ function App() {
                 element={
                   <Task
                     handleAddTask={handleAddTask}
-                    task={task}
-                    setTask={setTask}
-                    isSubmitting={isSubmitting}
                     tasks={tasks}
                     handleDeleteTask={handleDeleteTask}
+                    userName={userName}
                   />
                 }
               />
