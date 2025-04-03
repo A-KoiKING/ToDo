@@ -193,3 +193,7 @@ button:disabled {
   max-width: 300px;
   width: 100%;
 }
+
+.deletebutton {
+  background-color: #ff2727 !important;
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./Calendar.css";
 import { firestore } from "../firebase";
-import { collection, doc, getDoc, setDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 import Confirm from "./Confirm";
 
 function CalendarComponent({ initialUserName }) {
@@ -85,13 +85,22 @@ function CalendarComponent({ initialUserName }) {
     }
   };
 
-
-  const tileClassName = ({ date }) => {
+  const handleRemove = async () => {
     const formattedDate = date.toLocaleDateString("en-CA");
-    return activityDays.includes(formattedDate) ? "active-day" : "";
+    const docRef = doc(firestore, "activities", formattedDate);
+
+    try {
+      await updateDoc(docRef, { users: arrayRemove(userName) });
+      fetchAbsentees(date);
+    } catch (error) {
+      console.error("削除エラー:", error);
+      setConfirmMessage("削除に失敗しました");
+      setShowConfirm(true);
+    }
   };
 
   const isActivityDay = activityDays.includes(date.toLocaleDateString("en-CA"));
+  const isAbsent = absentees.includes(userName);
 
   return (
     <div className="calendar-container">
@@ -122,9 +131,10 @@ function CalendarComponent({ initialUserName }) {
           showNavigation={false}
           activeStartDate={viewDate}
           onActiveStartDateChange={({ activeStartDate }) => setViewDate(activeStartDate)}
-          tileClassName={tileClassName}
           showNeighboringMonth={false}
-          formatShortWeekday={(locale, date) => ["日", "月", "火", "水", "木", "金", "土"][date.getDay()]}
+          tileClassName={({ date }) =>
+            activityDays.includes(date.toLocaleDateString("en-CA")) ? "active-day" : ""
+          }
         />
         {/* 欠席者一覧 & 欠席登録フォーム */}
         <div className="absence-container">
@@ -145,16 +155,33 @@ function CalendarComponent({ initialUserName }) {
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を登録しますか？`);
+              if (isAbsent) {
+                setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を削除しますか？`);
+              } else {
+                setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を登録しますか？`);
+              }
               setShowConfirm(true);
             }}
             className="absence-form"
           >
             <h3>{date.toLocaleDateString("ja-JP")} の欠席登録</h3>
             <p>ユーザー名: <strong>{userName}</strong></p>
-            <button type="submit" disabled={absentees.includes(userName) || !isActivityDay}>
-              提出
-            </button>
+            {isAbsent ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を削除しますか？`);
+                  setShowConfirm(true);
+                }}
+                className="deletebutton"
+              >
+                削除
+              </button>
+            ) : (
+              <button type="submit" disabled={!isActivityDay}>
+                提出
+              </button>
+            )}
           </form>
           {/* 確認ダイアログ */}
           {showConfirm && (
@@ -162,7 +189,9 @@ function CalendarComponent({ initialUserName }) {
               message={confirmMessage}
               onConfirm={() => {
                 setShowConfirm(false);
-                if (confirmMessage.includes("登録しますか？")) {
+                if (confirmMessage.includes("削除しますか？")) {
+                  handleRemove();
+                } else {
                   handleSubmit();
                 }
               }}
