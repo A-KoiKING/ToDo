@@ -1,3 +1,24 @@
+.task-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  align-self: flex-start;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.task-background {
+  width: 100%;
+  max-width: 1200px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
 .content-accordion {
   width: 100%;
   margin-bottom: 10px;
