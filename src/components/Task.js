@@ -52,7 +52,6 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
   return (
     <div className="task-container">
       <div className="task-background">
-        <h1>タスク管理</h1>
         <form onSubmit={onSubmit} className="task-form">
           <input
             type="text"

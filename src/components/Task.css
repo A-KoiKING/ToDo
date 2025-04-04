@@ -19,76 +19,15 @@
   overflow-y: auto;
 }
 
-.content-accordion {
-  width: 100%;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.content-summary {
-  background-color: #ececec;
-  border-radius: 8px;
-  padding: 10px 15px;
-}
-
-.content-title {
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
-
-.content-details {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 0 0 8px 8px;
-}
-
-.content-box {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.content-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.content-item.no-border {
-  border-bottom: none;
-  text-align: center;
-  color: #999;
-}
-
-.content-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.content-name {
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.content-time {
-  font-size: 12px;
-  color: #666;
-}
-
-/* タスク追加欄のスタイル */
 .task-form {
   display: flex;
   gap: 10px;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: #e9e9e9;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .task-input {
@@ -124,4 +63,66 @@
 .task-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.content-accordion {
+  width: 100%;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.content-summary {
+  background-color: #ececec;
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+
+.content-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.content-details {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 0 0 8px 8px;
+}
+
+.content-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #eeeeee;
+}
+
+.content-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.content-item.no-border {
+  border-bottom: none;
+  text-align: center;
+  color: #999;
+}
+
+.content-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.content-time {
+  font-size: 12px;
+  color: #666;
 }
