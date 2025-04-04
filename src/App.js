@@ -147,9 +147,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.3.1"
-                    lastUpdated="2025-04-03"
-                    notice="Calendar Pageの欠席機能を実装"
+                    version="0.3.2"
+                    lastUpdated="2025-04-05"
+                    notice="Task Pageの重要度、CSSを実装"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }

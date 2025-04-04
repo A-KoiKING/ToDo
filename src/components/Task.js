@@ -62,18 +62,20 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
             autoComplete="off"
             className="task-input"
           />
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="task-select"
-          >
-            <option value="通常">通常</option>
-            <option value="重要">重要</option>
-            <option value="緊急">緊急</option>
-          </select>
-          <button type="submit" disabled={isSubmitting} className="task-button">
-            {isSubmitting ? "追加中..." : "追加"}
-          </button>
+          <div className="select-button-wrapper">
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="task-select"
+            >
+              <option value="通常">通常</option>
+              <option value="重要">重要</option>
+              <option value="緊急">緊急</option>
+            </select>
+            <button type="submit" disabled={isSubmitting} className="task-button">
+              {isSubmitting ? "追加中..." : "追加"}
+            </button>
+          </div>
         </form>
 
         <div className="accordion-container">
@@ -96,8 +98,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                     groupedTasks[level].map((task) => (
                       <div key={task.id} className="content-item">
                         <div className="content-content">
+                          <Typography className="content-user">
+                            <span className="user-label">ユーザー:</span>{" "}
+                            <strong>{task.user}</strong>
+                          </Typography>
                           <Typography className="content-name">
-                            {task.user} : {task.name}
+                            {task.name}
                           </Typography>
                           <Typography className="content-time">
                             {task.createdAt
@@ -107,7 +113,7 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                         </div>
                         <button
                           onClick={() => handleDeleteTask(task.id)}
-                          className="task-button"
+                          className="content-button"
                         >
                           削除
                         </button>
