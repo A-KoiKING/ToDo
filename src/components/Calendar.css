@@ -97,14 +97,10 @@
   bottom: 4px;
   width: 100%;
   height: 3px;
-  /* 下線の太さ */
   background-color: red;
-  /* 下線の色 */
   border-radius: 2px;
-  /* 角を少し丸める */
 }
 
-/* 曜日ラベルのスタイル変更 */
 .react-calendar__month-view__weekdays {
   border-bottom: 1px solid #666;
   background-color: #f0f0f0;
@@ -112,17 +108,14 @@
   font-weight: bold;
 }
 
-/* 土曜日を青色に */
 .react-calendar__month-view__weekdays__weekday:nth-child(6) {
   color: blue;
 }
 
-/* 日曜日を赤色に */
 .react-calendar__month-view__weekdays__weekday:nth-child(7) {
   color: red;
 }
 
-/* 曜日の点線の下線を削除 */
 .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none !important;
   border-bottom: none !important;
@@ -132,7 +125,6 @@
   .custom-navigation-label {
     font-size: 1em;
     min-width: 70px;
-
   }
 
   .custom-navigation button {
@@ -157,9 +149,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-}
-
-.absence-form button {
   background-color: #2d445b;
   color: white;
 }
@@ -172,7 +161,6 @@ button:disabled {
   opacity: 0.5;
 }
 
-/* 欠席者一覧と欠席登録フォームを横並び & 中央寄せ */
 .absence-container {
   display: flex;
   justify-content: center;
@@ -182,8 +170,8 @@ button:disabled {
   flex-wrap: wrap;
 }
 
-/* 欠席者一覧とフォームの共通デザイン */
-.absentees-list, .absence-form {
+.absentees-list,
+.absence-form {
   background: white;
   padding: 20px;
   border: 1px solid #ccc;
@@ -196,4 +184,37 @@ button:disabled {
 
 .deletebutton {
   background-color: #ff2727 !important;
+}
+
+/* 活動ステータス編集ボタン */
+.activity-setup-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.activity-setup-button {
+  padding: 8px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 活動ステータスドロップダウン */
+.activity-status-dropdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.activity-status-dropdown select {
+  padding: 5px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }

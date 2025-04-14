@@ -2,18 +2,28 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./Calendar.css";
 import { firestore } from "../firebase";
-import { collection, doc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
-import Confirm from "./Confirm";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot,
+} from "firebase/firestore";
+import TextConfirm from "./TextConfirm";
 
 function CalendarComponent({ initialUserName }) {
   const [date, setDate] = useState(new Date());
   const [viewDate, setViewDate] = useState(new Date());
   const [activityDays, setActivityDays] = useState([]);
   const [userName] = useState(initialUserName);
-  const [confirmMessage, setConfirmMessage] = useState("");
-  const [showConfirm, setShowConfirm] = useState(false);
   const [absentees, setAbsentees] = useState([]);
+  const [isActive, setIsActive] = useState(false);
+  const [textConfirmOpen, setTextConfirmOpen] = useState(false);
+  const [authGranted, setAuthGranted] = useState(false);
 
+  // 活動日一覧を取得
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(firestore, "activities"), (snapshot) => {
       const days = snapshot.docs
@@ -26,15 +36,19 @@ function CalendarComponent({ initialUserName }) {
     return () => unsubscribe();
   }, []);
 
+  // 選択した日の欠席者と活動日状態を取得
   useEffect(() => {
     const formattedDate = date.toLocaleDateString("en-CA");
     const docRef = doc(firestore, "activities", formattedDate);
 
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        setAbsentees(docSnap.data().users || []);
+        const data = docSnap.data();
+        setAbsentees(data.users || []);
+        setIsActive(data.active === true);
       } else {
         setAbsentees([]);
+        setIsActive(false);
       }
     });
 
@@ -64,43 +78,23 @@ function CalendarComponent({ initialUserName }) {
   };
 
   const handleSubmit = async () => {
-    if (!userName.trim()) {
-      setConfirmMessage("ログイン情報がありません");
-      setShowConfirm(true);
-      return;
-    }
-
     const formattedDate = date.toLocaleDateString("en-CA");
     const docRef = doc(firestore, "activities", formattedDate);
-
-    try {
-      await setDoc(docRef, { users: arrayUnion(userName) }, { merge: true });
-    } catch (error) {
-      console.error("エラー:", error);
-      setConfirmMessage("登録に失敗しました");
-      setShowConfirm(true);
-    }
+    await setDoc(docRef, { users: arrayUnion(userName) }, { merge: true });
   };
 
   const handleRemove = async () => {
     const formattedDate = date.toLocaleDateString("en-CA");
     const docRef = doc(firestore, "activities", formattedDate);
-
-    try {
-      await updateDoc(docRef, { users: arrayRemove(userName) });
-    } catch (error) {
-      console.error("削除エラー:", error);
-      setConfirmMessage("削除に失敗しました");
-      setShowConfirm(true);
-    }
+    await updateDoc(docRef, { users: arrayRemove(userName) });
   };
 
-  const isActivityDay = activityDays.includes(date.toLocaleDateString("en-CA"));
   const isAbsent = absentees.includes(userName);
 
   return (
     <div className="calendar-container">
       <div className="calendar-background">
+        {/* カスタムナビゲーション */}
         <div className="custom-navigation">
           <button
             onClick={handlePrevMonth}
@@ -120,6 +114,17 @@ function CalendarComponent({ initialUserName }) {
             次の月へ
           </button>
         </div>
+
+        {/* パスワード認証用ボタン */}
+        <div className="activity-setup-button-container">
+          {!authGranted && (
+            <button className="activity-setup-button" onClick={() => setTextConfirmOpen(true)}>
+              活動ステータスを編集
+            </button>
+          )}
+        </div>
+
+        {/* カレンダー表示 */}
         <Calendar
           onChange={onChange}
           value={date}
@@ -132,9 +137,34 @@ function CalendarComponent({ initialUserName }) {
             activityDays.includes(date.toLocaleDateString("en-CA")) ? "active-day" : ""
           }
         />
-        {/* 欠席者一覧 & 欠席登録フォーム */}
+
+        {/* 活動ステータスの変更ドロップダウン */}
+        {authGranted && (
+          <div className="activity-status-dropdown">
+            <label>活動ステータス: </label>
+            <select
+              value={isActive ? "active" : "inactive"}
+              onChange={async (e) => {
+                const newStatus = e.target.value === "active";
+                const formattedDate = date.toLocaleDateString("en-CA");
+                const docRef = doc(firestore, "activities", formattedDate);
+
+                try {
+                  await setDoc(docRef, { active: newStatus }, { merge: true });
+                  setIsActive(newStatus);
+                } catch (error) {
+                  console.error("活動ステータス更新エラー:", error);
+                }
+              }}
+            >
+              <option value="active">活動日</option>
+              <option value="inactive">非活動日</option>
+            </select>
+          </div>
+        )}
+
+        {/* 欠席登録フォームと一覧 */}
         <div className="absence-container">
-          {/* 欠席者一覧 */}
           <div className="absentees-list">
             <h3>{date.toLocaleDateString("ja-JP")} の欠席者</h3>
             {absentees.length > 0 ? (
@@ -147,16 +177,11 @@ function CalendarComponent({ initialUserName }) {
               <p>欠席者はいません</p>
             )}
           </div>
-          {/* 欠席登録フォーム */}
+
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              if (isAbsent) {
-                setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を削除しますか？`);
-              } else {
-                setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を登録しますか？`);
-              }
-              setShowConfirm(true);
+              isAbsent ? handleRemove() : handleSubmit();
             }}
             className="absence-form"
           >
@@ -165,36 +190,28 @@ function CalendarComponent({ initialUserName }) {
             {isAbsent ? (
               <button
                 type="button"
-                onClick={() => {
-                  setConfirmMessage(`${date.toLocaleDateString("ja-JP")} の欠席を削除しますか？`);
-                  setShowConfirm(true);
-                }}
+                onClick={handleRemove}
                 className="deletebutton"
               >
                 削除
               </button>
             ) : (
-              <button type="submit" disabled={!isActivityDay}>
+              <button type="submit" disabled={!isActive}>
                 提出
               </button>
             )}
           </form>
-          {/* 確認ダイアログ */}
-          {showConfirm && (
-            <Confirm
-              message={confirmMessage}
-              onConfirm={() => {
-                setShowConfirm(false);
-                if (confirmMessage.includes("削除しますか？")) {
-                  handleRemove();
-                } else {
-                  handleSubmit();
-                }
-              }}
-              onCancel={() => setShowConfirm(false)}
-            />
-          )}
         </div>
+
+        {/* パスワード入力ダイアログ */}
+        <TextConfirm
+          open={textConfirmOpen}
+          onCancel={() => setTextConfirmOpen(false)}
+          onConfirm={() => {
+            setTextConfirmOpen(false);
+            setAuthGranted(true);
+          }}
+        />
       </div>
     </div>
   );
