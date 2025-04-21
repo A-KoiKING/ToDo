@@ -76,7 +76,7 @@ function Home({ lastUpdated, version, notice, targetDate }) {
         <span className="title-part">ロボット研究会</span>
       </h1>
       <h2 className="home-h2">
-        地区大会まで
+        地区大会(9/28)まで
       </h2>
       {targetDate && (
         <p className={`timer ${isExpired ? 'expired' : ''}`}>
