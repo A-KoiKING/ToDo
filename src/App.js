@@ -147,9 +147,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.4.2"
+                    version="0.4.3"
                     lastUpdated="2025-04-21"
-                    notice="Home画面に日にちを追加！"
+                    notice="タスクの個人間を実装！"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }

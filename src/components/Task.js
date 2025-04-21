@@ -5,6 +5,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 import "./Task.css";
 
@@ -17,6 +19,10 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     重要: false,
     緊急: false,
   });
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
 
   useEffect(() => {
     setOpenAccordions((prev) => ({
@@ -49,6 +55,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     緊急: tasks.filter((task) => task.priority === "緊急"),
   };
 
+  const groupedByUser = tasks.reduce((acc, task) => {
+    if (!acc[task.user]) acc[task.user] = [];
+    acc[task.user].push(task);
+    return acc;
+  }, {});  
+
   return (
     <div className="task-container">
       <div className="task-background">
@@ -78,33 +90,80 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
           </div>
         </form>
 
+        <Tabs value={tabIndex} onChange={handleTabChange} className="task-tabs">
+          <Tab label="重要度別" />
+          <Tab label="ユーザー別" />
+        </Tabs>
+
         <div className="accordion-container">
-          {["緊急", "重要", "通常"].map((level) => (
-            <Accordion
-              className="content-accordion"
-              key={level}
-              expanded={openAccordions[level]}
-              onChange={() => toggleAccordion(level)}
-            >
-              <AccordionSummary
-                className="content-summary"
-                expandIcon={<ExpandMoreIcon />}
+          {tabIndex === 0 ? (
+            // 重要度別
+            ["緊急", "重要", "通常"].map((level) => (
+              <Accordion
+                className="content-accordion"
+                key={level}
+                expanded={openAccordions[level]}
+                onChange={() => toggleAccordion(level)}
               >
-                <Typography className="content-title">{level}</Typography>
-              </AccordionSummary>
-              <AccordionDetails className="content-details">
-                <Box className="content-box">
-                  {groupedTasks[level].length > 0 ? (
-                    groupedTasks[level].map((task) => (
+                <AccordionSummary
+                  className="content-summary"
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography className="content-title">{level}</Typography>
+                </AccordionSummary>
+                <AccordionDetails className="content-details">
+                  <Box className="content-box">
+                    {groupedTasks[level].length > 0 ? (
+                      groupedTasks[level].map((task) => (
+                        <div key={task.id} className="content-item">
+                          <div className="content-content">
+                            <Typography className="content-user">
+                              <span className="user-label">ユーザー:</span>{" "}
+                              <strong>{task.user}</strong>
+                            </Typography>
+                            <Typography className="content-name">
+                              {task.name}
+                            </Typography>
+                            <Typography className="content-time">
+                              {task.createdAt
+                                ? new Date(task.createdAt.seconds * 1000).toLocaleString()
+                                : "日時不明"}
+                            </Typography>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="content-button"
+                          >
+                            削除
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <Typography className="content-item no-border">
+                        タスクがありません
+                      </Typography>
+                    )}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            ))
+          ) : (
+            // ユーザー別
+            Object.entries(groupedByUser).map(([user, userTasks]) => (
+              <Accordion className="content-accordion" key={user}>
+                <AccordionSummary
+                  className="content-summary"
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography className="content-title">{user}</Typography>
+                </AccordionSummary>
+                <AccordionDetails className="content-details">
+                  <Box className="content-box">
+                    {userTasks.map((task) => (
                       <div key={task.id} className="content-item">
                         <div className="content-content">
-                          <Typography className="content-user">
-                            <span className="user-label">ユーザー:</span>{" "}
-                            <strong>{task.user}</strong>
-                          </Typography>
-                          <Typography className="content-name">
-                            {task.name}
-                          </Typography>
+                          <Typography className="content-name">{task.name}</Typography>
+                          <Typography className="content-priority">重要度: {task.priority}</Typography>
                           <Typography className="content-time">
                             {task.createdAt
                               ? new Date(task.createdAt.seconds * 1000).toLocaleString()
@@ -118,16 +177,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                           削除
                         </button>
                       </div>
-                    ))
-                  ) : (
-                    <Typography className="content-item no-border">
-                      タスクがありません
-                    </Typography>
-                  )}
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                    ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            ))
+          )}
         </div>
       </div>
     </div>
