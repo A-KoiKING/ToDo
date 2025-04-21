@@ -1,6 +1,8 @@
-.reservation-dialog {
-  padding: 20px;
+.reservation-dialog .MuiDialog-paper {
+  width: 600px;
+  max-width: 90%;
 }
+
 
 .dialog-title {
   font-size: 18px;

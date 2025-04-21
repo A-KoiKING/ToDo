@@ -19,7 +19,7 @@ const Selecte = ({
   onCancel,
 }) => {
   return (
-    <Dialog className="reservation-dialog" open={open} onClose={onCancel}>
+    <Dialog className="reservation-dialog" open={open} onClose={onCancel} fullWidth maxWidth="md">
       <DialogTitle className="dialog-title">チーム状態の変更</DialogTitle>
       <DialogContent className="dialog-content">
         <Select

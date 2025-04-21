@@ -147,9 +147,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.4.0"
-                    lastUpdated="2025-04-14"
-                    notice="Calendar内で活動日の設定できるようにする"
+                    version="0.4.1"
+                    lastUpdated="2025-04-21"
+                    notice="予約画面を見やすくしました！"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }
