@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-
+import Confirm from "./Confirm";
 import "./Task.css";
 
 function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
@@ -20,6 +20,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     緊急: false,
   });
   const [tabIndex, setTabIndex] = useState(0);
+  const [checkedTasks, setCheckedTasks] = useState({});
+
+  // 🔥 ここ追加
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmingTaskId, setConfirmingTaskId] = useState(null);
+
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
@@ -59,7 +65,32 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     if (!acc[task.user]) acc[task.user] = [];
     acc[task.user].push(task);
     return acc;
-  }, {});  
+  }, {});
+
+  const handleCheckboxChange = (taskId) => {
+    setCheckedTasks((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
+
+  const handleDeleteClick = (taskId) => {
+    setConfirmingTaskId(taskId);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmYes = () => {
+    if (confirmingTaskId) {
+      handleDeleteTask(confirmingTaskId);
+    }
+    setShowConfirm(false);
+    setConfirmingTaskId(null);
+  };
+
+  const handleConfirmNo = () => {
+    setShowConfirm(false);
+    setConfirmingTaskId(null);
+  };
 
   return (
     <div className="task-container">
@@ -97,7 +128,6 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
 
         <div className="accordion-container">
           {tabIndex === 0 ? (
-            // 重要度別
             ["緊急", "重要", "通常"].map((level) => (
               <Accordion
                 className="content-accordion"
@@ -116,6 +146,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                     {groupedTasks[level].length > 0 ? (
                       groupedTasks[level].map((task) => (
                         <div key={task.id} className="content-item">
+                          <input
+                            type="checkbox"
+                            checked={!!checkedTasks[task.id]}
+                            onChange={() => handleCheckboxChange(task.id)}
+                            style={{ marginRight: "10px" }}
+                          />
                           <div className="content-content">
                             <Typography className="content-user">
                               <span className="user-label">ユーザー:</span>{" "}
@@ -131,7 +167,7 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                             </Typography>
                           </div>
                           <button
-                            onClick={() => handleDeleteTask(task.id)}
+                            onClick={() => handleDeleteClick(task.id)}
                             className="content-button"
                           >
                             削除
@@ -148,7 +184,6 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
               </Accordion>
             ))
           ) : (
-            // ユーザー別
             Object.entries(groupedByUser).map(([user, userTasks]) => (
               <Accordion className="content-accordion" key={user}>
                 <AccordionSummary
@@ -161,6 +196,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                   <Box className="content-box">
                     {userTasks.map((task) => (
                       <div key={task.id} className="content-item">
+                        <input
+                          type="checkbox"
+                          checked={!!checkedTasks[task.id]}
+                          onChange={() => handleCheckboxChange(task.id)}
+                          style={{ marginRight: "10px" }}
+                        />
                         <div className="content-content">
                           <Typography className="content-name">{task.name}</Typography>
                           <Typography className="content-priority">重要度: {task.priority}</Typography>
@@ -171,7 +212,7 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                           </Typography>
                         </div>
                         <button
-                          onClick={() => handleDeleteTask(task.id)}
+                          onClick={() => handleDeleteClick(task.id)}
                           className="content-button"
                         >
                           削除
@@ -184,6 +225,15 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
             ))
           )}
         </div>
+
+        {/* Confirm ダイアログをここにまとめて置く */}
+        {showConfirm && (
+          <Confirm
+            message="このタスクを本当に削除しますか？"
+            onConfirm={handleConfirmYes}
+            onCancel={handleConfirmNo}
+          />
+        )}
       </div>
     </div>
   );
