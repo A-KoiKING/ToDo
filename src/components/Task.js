@@ -19,15 +19,22 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     重要: false,
     緊急: false,
   });
+  const [openUserAccordions, setOpenUserAccordions] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
   const [checkedTasks, setCheckedTasks] = useState({});
-
-  // 🔥 ここ追加
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmingTaskId, setConfirmingTaskId] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+
+    if (newValue === 1) {
+      const allUsersOpen = Object.keys(groupedByUser).reduce((acc, user) => {
+        acc[user] = true;
+        return acc;
+      }, {});
+      setOpenUserAccordions(allUsersOpen);
+    }
   };
 
   useEffect(() => {
@@ -52,6 +59,13 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     setOpenAccordions((prev) => ({
       ...prev,
       [level]: !prev[level],
+    }));
+  };
+
+  const toggleUserAccordion = (user) => {
+    setOpenUserAccordions((prev) => ({
+      ...prev,
+      [user]: !prev[user],
     }));
   };
 
@@ -157,9 +171,7 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                               <span className="user-label">ユーザー:</span>{" "}
                               <strong>{task.user}</strong>
                             </Typography>
-                            <Typography className="content-name">
-                              {task.name}
-                            </Typography>
+                            <Typography className="content-name">{task.name}</Typography>
                             <Typography className="content-time">
                               {task.createdAt
                                 ? new Date(task.createdAt.seconds * 1000).toLocaleString()
@@ -185,7 +197,12 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
             ))
           ) : (
             Object.entries(groupedByUser).map(([user, userTasks]) => (
-              <Accordion className="content-accordion" key={user}>
+              <Accordion
+                className="content-accordion"
+                key={user}
+                expanded={!!openUserAccordions[user]}
+                onChange={() => toggleUserAccordion(user)}
+              >
                 <AccordionSummary
                   className="content-summary"
                   expandIcon={<ExpandMoreIcon />}
@@ -226,7 +243,6 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
           )}
         </div>
 
-        {/* Confirm ダイアログをここにまとめて置く */}
         {showConfirm && (
           <Confirm
             message="このタスクを本当に削除しますか？"
