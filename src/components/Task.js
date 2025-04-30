@@ -10,16 +10,27 @@ import Tab from "@mui/material/Tab";
 import Confirm from "./Confirm";
 import "./Task.css";
 
+function formatPeriod(startDate, endDate) {
+  const format = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+  return `${format(startDate)} ~ ${format(endDate)}`;
+}
+
 function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
   const [taskName, setTaskName] = useState("");
   const [priority, setPriority] = useState("通常");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openAccordions, setOpenAccordions] = useState({
     通常: false,
     重要: false,
     緊急: false,
   });
-  const [openUserAccordions, setOpenUserAccordions] = useState({});
+  const [openUserAccordions, setOpenUserAccordions] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [checkedTasks, setCheckedTasks] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
@@ -27,12 +38,8 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
-
     if (newValue === 1) {
-      const allUsersOpen = Object.keys(groupedByUser).reduce((acc, user) => {
-        acc[user] = true;
-        return acc;
-      }, {});
+      const allUsersOpen = Object.keys(groupedByUser);
       setOpenUserAccordions(allUsersOpen);
     }
   };
@@ -49,24 +56,22 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     e.preventDefault();
     if (taskName.trim() === "" || isSubmitting) return;
     setIsSubmitting(true);
-    await handleAddTask({ name: taskName, priority, user: userName });
+    await handleAddTask({ name: taskName, priority, user: userName, startDate, endDate });
     setTaskName("");
     setPriority("通常");
+    setStartDate("");
+    setEndDate("");
     setIsSubmitting(false);
   };
 
   const toggleAccordion = (level) => {
-    setOpenAccordions((prev) => ({
-      ...prev,
-      [level]: !prev[level],
-    }));
+    setOpenAccordions((prev) => ({ ...prev, [level]: !prev[level] }));
   };
 
   const toggleUserAccordion = (user) => {
-    setOpenUserAccordions((prev) => ({
-      ...prev,
-      [user]: !prev[user],
-    }));
+    setOpenUserAccordions((prev) =>
+      prev.includes(user) ? prev.filter((u) => u !== user) : [...prev, user]
+    );
   };
 
   const groupedTasks = {
@@ -81,11 +86,14 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
     return acc;
   }, {});
 
+  useEffect(() => {
+    if (tabIndex === 1) {
+      setOpenUserAccordions(Object.keys(groupedByUser));
+    }
+  }, [groupedByUser, tabIndex]);
+
   const handleCheckboxChange = (taskId) => {
-    setCheckedTasks((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }));
+    setCheckedTasks((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
   };
 
   const handleDeleteClick = (taskId) => {
@@ -119,20 +127,30 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
             autoComplete="off"
             className="task-input"
           />
-          <div className="select-button-wrapper">
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className="task-select"
-            >
-              <option value="通常">通常</option>
-              <option value="重要">重要</option>
-              <option value="緊急">緊急</option>
-            </select>
-            <button type="submit" disabled={isSubmitting} className="task-button">
-              {isSubmitting ? "追加中..." : "追加"}
-            </button>
-          </div>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="task-select"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="task-select"
+          />
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="task-select"
+          >
+            <option value="通常">通常</option>
+            <option value="重要">重要</option>
+            <option value="緊急">緊急</option>
+          </select>
+          <button type="submit" disabled={isSubmitting} className="task-button">
+            {isSubmitting ? "追加中..." : "追加"}
+          </button>
         </form>
 
         <Tabs value={tabIndex} onChange={handleTabChange} className="task-tabs">
@@ -141,24 +159,69 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
         </Tabs>
 
         <div className="accordion-container">
-          {tabIndex === 0 ? (
-            ["緊急", "重要", "通常"].map((level) => (
-              <Accordion
-                className="content-accordion"
-                key={level}
-                expanded={openAccordions[level]}
-                onChange={() => toggleAccordion(level)}
-              >
-                <AccordionSummary
-                  className="content-summary"
-                  expandIcon={<ExpandMoreIcon />}
+          {tabIndex === 0
+            ? ["緊急", "重要", "通常"].map((level) => (
+                <Accordion
+                  className="content-accordion"
+                  key={level}
+                  expanded={openAccordions[level]}
+                  onChange={() => toggleAccordion(level)}
                 >
-                  <Typography className="content-title">{level}</Typography>
-                </AccordionSummary>
-                <AccordionDetails className="content-details">
-                  <Box className="content-box">
-                    {groupedTasks[level].length > 0 ? (
-                      groupedTasks[level].map((task) => (
+                  <AccordionSummary className="content-summary" expandIcon={<ExpandMoreIcon />}>
+                    <Typography className="content-title">{level}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails className="content-details">
+                    <Box className="content-box">
+                      {groupedTasks[level].length > 0 ? (
+                        groupedTasks[level].map((task) => (
+                          <div key={task.id} className="content-item">
+                            <input
+                              type="checkbox"
+                              checked={!!checkedTasks[task.id]}
+                              onChange={() => handleCheckboxChange(task.id)}
+                              style={{ marginRight: "10px" }}
+                            />
+                            <div className="content-content">
+                              <Typography className="content-user">
+                                <span className="user-label">ユーザー:</span> <strong>{task.user}</strong>
+                              </Typography>
+                              <Typography className="content-name">{task.name}</Typography>
+                              <Typography className="content-time">
+                                {task.createdAt
+                                  ? new Date(task.createdAt.seconds * 1000).toLocaleString()
+                                  : "日時不明"}
+                              </Typography>
+                              {(task.startDate || task.endDate) && (
+                                <Typography className="content-time">
+                                  期間: {formatPeriod(task.startDate, task.endDate)}
+                                </Typography>
+                              )}
+                            </div>
+                            <button onClick={() => handleDeleteClick(task.id)} className="content-button">
+                              削除
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <Typography className="content-item no-border">タスクがありません</Typography>
+                      )}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              ))
+            : Object.entries(groupedByUser).map(([user, userTasks]) => (
+                <Accordion
+                  className="content-accordion"
+                  key={user}
+                  expanded={openUserAccordions.includes(user)}
+                  onChange={() => toggleUserAccordion(user)}
+                >
+                  <AccordionSummary className="content-summary" expandIcon={<ExpandMoreIcon />}>
+                    <Typography className="content-title">{user}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails className="content-details">
+                    <Box className="content-box">
+                      {userTasks.map((task) => (
                         <div key={task.id} className="content-item">
                           <input
                             type="checkbox"
@@ -167,80 +230,28 @@ function Task({ handleAddTask, tasks, handleDeleteTask, userName }) {
                             style={{ marginRight: "10px" }}
                           />
                           <div className="content-content">
-                            <Typography className="content-user">
-                              <span className="user-label">ユーザー:</span>{" "}
-                              <strong>{task.user}</strong>
-                            </Typography>
                             <Typography className="content-name">{task.name}</Typography>
+                            <Typography className="content-priority">重要度: {task.priority}</Typography>
                             <Typography className="content-time">
                               {task.createdAt
                                 ? new Date(task.createdAt.seconds * 1000).toLocaleString()
                                 : "日時不明"}
                             </Typography>
+                            {(task.startDate || task.endDate) && (
+                              <Typography className="content-time">
+                                期間: {formatPeriod(task.startDate, task.endDate)}
+                              </Typography>
+                            )}
                           </div>
-                          <button
-                            onClick={() => handleDeleteClick(task.id)}
-                            className="content-button"
-                          >
+                          <button onClick={() => handleDeleteClick(task.id)} className="content-button">
                             削除
                           </button>
                         </div>
-                      ))
-                    ) : (
-                      <Typography className="content-item no-border">
-                        タスクがありません
-                      </Typography>
-                    )}
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            ))
-          ) : (
-            Object.entries(groupedByUser).map(([user, userTasks]) => (
-              <Accordion
-                className="content-accordion"
-                key={user}
-                expanded={!!openUserAccordions[user]}
-                onChange={() => toggleUserAccordion(user)}
-              >
-                <AccordionSummary
-                  className="content-summary"
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography className="content-title">{user}</Typography>
-                </AccordionSummary>
-                <AccordionDetails className="content-details">
-                  <Box className="content-box">
-                    {userTasks.map((task) => (
-                      <div key={task.id} className="content-item">
-                        <input
-                          type="checkbox"
-                          checked={!!checkedTasks[task.id]}
-                          onChange={() => handleCheckboxChange(task.id)}
-                          style={{ marginRight: "10px" }}
-                        />
-                        <div className="content-content">
-                          <Typography className="content-name">{task.name}</Typography>
-                          <Typography className="content-priority">重要度: {task.priority}</Typography>
-                          <Typography className="content-time">
-                            {task.createdAt
-                              ? new Date(task.createdAt.seconds * 1000).toLocaleString()
-                              : "日時不明"}
-                          </Typography>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteClick(task.id)}
-                          className="content-button"
-                        >
-                          削除
-                        </button>
-                      </div>
-                    ))}
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            ))
-          )}
+                      ))}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
         </div>
 
         {showConfirm && (

@@ -97,6 +97,8 @@ function App() {
         name: taskData.name,
         user: taskData.user,
         priority: taskData.priority,
+        startDate: taskData.startDate,
+        endDate: taskData.endDate,
         createdAt: new Date(),
       });
     } catch (error) {
@@ -147,9 +149,9 @@ function App() {
                 path="/home"
                 element={
                   <Home
-                    version="0.4.4"
+                    version="0.4.5"
                     lastUpdated="2025-04-30"
-                    notice="タスクの個人タブの機能修正！"
+                    notice="タスクに期間を追加！"
                     targetDate="2025-09-28T13:00:00"
                   />
                 }

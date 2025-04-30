@@ -207,3 +207,9 @@
     flex-shrink: 0;
   }
 }
+
+.content-time {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 2px;
+}
