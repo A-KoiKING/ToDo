@@ -11,6 +11,7 @@ import {
   arrayRemove,
   onSnapshot,
 } from "firebase/firestore";
+import Confirm from "./Confirm";
 import TextConfirm from "./TextConfirm";
 
 function CalendarComponent({ initialUserName }) {
@@ -22,6 +23,9 @@ function CalendarComponent({ initialUserName }) {
   const [isActive, setIsActive] = useState(false);
   const [textConfirmOpen, setTextConfirmOpen] = useState(false);
   const [authGranted, setAuthGranted] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState(false);
+
 
   // 活動日一覧を取得
   useEffect(() => {
@@ -190,7 +194,10 @@ function CalendarComponent({ initialUserName }) {
             {isAbsent ? (
               <button
                 type="button"
-                onClick={handleRemove}
+                onClick={() => {
+                  setPendingRemove(true);
+                  setConfirmOpen(true);
+                }}
                 className="deletebutton"
               >
                 削除
@@ -212,6 +219,21 @@ function CalendarComponent({ initialUserName }) {
             setAuthGranted(true);
           }}
         />
+
+        {confirmOpen && (
+          <Confirm
+            message="欠席者登録を削除しますか？"
+            onConfirm={async () => {
+              await handleRemove();
+              setConfirmOpen(false);
+              setPendingRemove(false);
+            }}
+            onCancel={() => {
+              setConfirmOpen(false);
+              setPendingRemove(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
