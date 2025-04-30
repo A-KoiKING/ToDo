@@ -24,7 +24,6 @@ function CalendarComponent({ initialUserName }) {
   const [textConfirmOpen, setTextConfirmOpen] = useState(false);
   const [authGranted, setAuthGranted] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingRemove, setPendingRemove] = useState(false);
 
 
   // 活動日一覧を取得
@@ -195,7 +194,6 @@ function CalendarComponent({ initialUserName }) {
               <button
                 type="button"
                 onClick={() => {
-                  setPendingRemove(true);
                   setConfirmOpen(true);
                 }}
                 className="deletebutton"
@@ -226,11 +224,9 @@ function CalendarComponent({ initialUserName }) {
             onConfirm={async () => {
               await handleRemove();
               setConfirmOpen(false);
-              setPendingRemove(false);
             }}
             onCancel={() => {
               setConfirmOpen(false);
-              setPendingRemove(false);
             }}
           />
         )}
